@@ -57,7 +57,7 @@ def LoginPage():
     bot.columnconfigure(0, weight=1)
     bot.grid(row=2, column=0, sticky="news")
 
-    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=loginclicked)
+    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=MainPage)
     loginBtn.grid(row=0, column=0)
 
 
