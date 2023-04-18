@@ -107,8 +107,8 @@ def MainPage():
     warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
     warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
 
-    # จัดการผู้ค่าส่ง
-    supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค่าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
+    # จัดการผู้ค้าส่ง
+    supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค้าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
     supplierManagementBtn.grid(row=1, columnspan=2, sticky="news")
 
     # Logout Button
@@ -343,7 +343,7 @@ def modifyProductClicked():
         messagebox.showerror("Admin:", "กรุณาเลือกสินค้าที่ต้องการจะแก้ไข")
     else:
         selectedProd = warehouseTree.item(warehouseTree.focus(), "values")
-        selectedProd_id = selectedProd[0]
+        selectedProd_id = int(selectedProd[0])
         selectedProd_name = selectedProd[1]
         selectedProd_cost = selectedProd[2]
         selectedProd_price = selectedProd[3]
@@ -354,7 +354,7 @@ def modifyProductClicked():
         w = 500
         h = 500
         modifyWindow = Toplevel(root)
-        modifyWindow.title("เพิ่มสินค้าใหม่")
+        modifyWindow.title("แก้ไขสินค้า")
         modifyWindow.rowconfigure(0, weight=1)
         modifyWindow.columnconfigure(0, weight=1)
         x = root.winfo_screenwidth() / 2 - w / 2
@@ -410,18 +410,18 @@ def supplierManagementClicked():
     middle.grid(row=1, column=0, sticky="news")
 
     #header
-    Label(top, text="ผู้ค่าส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+    Label(top, text="ผู้ค้าส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
 
     supplierTree = ttk.Treeview(middle)
     supplierTree.column("#0", width=0, stretch=NO)
-    supplierTree["columns"] = ("รหัสผู้ค่าส่ง","ชื่อร้าน/สวน", "ชื่อผู้ติดต่อ", "เบอร์โทรศัพท์")
+    supplierTree["columns"] = ("รหัสผู้ค้าส่ง","ชื่อร้าน/สวน", "ชื่อผู้ติดต่อ", "เบอร์โทรศัพท์")
 
-    supplierTree.column("รหัสผู้ค่าส่ง", width=100, anchor=CENTER)
+    supplierTree.column("รหัสผู้ค้าส่ง", width=100, anchor=CENTER)
     supplierTree.column("ชื่อร้าน/สวน", width=100, anchor=CENTER)
-    supplierTree.column("ชื่อผู้ติดต่อ", width=120, anchor=E)
-    supplierTree.column("เบอร์โทรศัพท์", width=120, anchor=E)
+    supplierTree.column("ชื่อผู้ติดต่อ", width=120, anchor=CENTER)
+    supplierTree.column("เบอร์โทรศัพท์", width=120, anchor=CENTER)
 
-    supplierTree.heading("รหัสผู้ค่าส่ง", text="รหัสผู้ค่าส่ง")
+    supplierTree.heading("รหัสผู้ค้าส่ง", text="รหัสผู้ค้าส่ง")
     supplierTree.heading("ชื่อร้าน/สวน", text="ชื่อร้าน/สวน")
     supplierTree.heading("ชื่อผู้ติดต่อ", text="ชื่อผู้ติดต่อ")
     supplierTree.heading("เบอร์โทรศัพท์", text="เบอร์โทรศัพท์")
@@ -429,13 +429,13 @@ def supplierManagementClicked():
     supplierTree.grid(row=0, column=0)
 
     # Add Button
-    Button(middle, text="เพิ่มผู้ค่าส่ง", fg="black", bg="green", borderless=1, command=addSupplierClicked).grid(row=0, column=0, sticky='ne', padx=180, pady=170)
+    Button(middle, text="เพิ่มผู้ค้าส่ง", fg="black", bg="green", borderless=1, command=addSupplierClicked).grid(row=0, column=0, sticky='ne', padx=180, pady=170)
 
     # Modify Button
-    Button(middle, text="แก้ไขผู้ค่าส่ง", fg="black", bg="yellow", borderless=1, command=modifySupperlierClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
+    Button(middle, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, command=modifySupperlierClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
 
     #Delete Button
-    Button(middle, text="ลบผู้ค่าส่ง", fg="black", bg="red", borderless=1, command=deleteSupplierClicked).grid(row=0, column=0, sticky='se', padx=180, pady=170)
+    Button(middle, text="ลบผู้ค้าส่ง", fg="black", bg="red", borderless=1, command=deleteSupplierClicked).grid(row=0, column=0, sticky='se', padx=180, pady=170)
     
     fetchSupplierTree()
     
@@ -447,7 +447,7 @@ def fetchSupplierTree():
     res = cursor.fetchall()
     if res:
         for i in range(len(res)):
-            warehouseTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][3]))
+            supplierTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][3]))
 
 
 def addSupplierClicked():
@@ -467,7 +467,7 @@ def addSupplierClicked():
         elif phoneEnt.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่เบอร์โทรศัพท์")
             phoneEnt.focus_force()
-        elif phoneEnt.get().replace('-', '',3).isnumeric() == False or len(phoneEnt.get().replace('-', '',3)) != 10  or len(phoneEnt.get().replace('-', '',3)) != 9:
+        elif phoneEnt.get().replace('-', '').isnumeric() == False or (len(phoneEnt.get().replace('-', '')) != 10 and len(phoneEnt.get().replace('-', '')) != 9):
             messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
             phoneEnt.focus_force()
         else:
@@ -483,9 +483,9 @@ def addSupplierClicked():
             
             if isValid:
                 sql = "INSERT INTO SupplierContactTable (supplierName, contactName, phone) VALUES (?,?,?)"
-                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get()])
+                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get().replace('-','')])
                 conn.commit()
-                messagebox.showinfo("Admin:", "สินค้าใหม่ได้ถูกเพิ่มเข้าคลังแล้ว")
+                messagebox.showinfo("Admin:", "ผู้ค้าส่งใหม่ได้ถูกเพิ่มเข้าสู่ฐานระบบแล้ว")
                 addSupplierWindow.destroy()
                 fetchSupplierTree()
             else:
@@ -494,7 +494,7 @@ def addSupplierClicked():
     w = 500
     h = 500
     addSupplierWindow = Toplevel(root)
-    addSupplierWindow.title("เพิ่มผู้ค่าส่งใหม่")
+    addSupplierWindow.title("เพิ่มผู้ค้าส่งใหม่")
     addSupplierWindow.rowconfigure(0, weight=1)
     addSupplierWindow.columnconfigure(0, weight=1)
     x = root.winfo_screenwidth() / 2 - w / 2
@@ -514,7 +514,7 @@ def addSupplierClicked():
     contactNameEnt = Entry(addSupplierFrame, width=20)
     contactNameEnt.grid(row=1, column=1, sticky='w')
 
-    Label(addSupplierFrame, text="เบอร์โทรสัพท์ติดต่อ:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+    Label(addSupplierFrame, text="เบอร์โทรศัพท์ติดต่อ:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
     phoneEnt = Entry(addSupplierFrame, width=20)
     phoneEnt.grid(row=2, column=1, sticky='w')
 
@@ -522,14 +522,93 @@ def addSupplierClicked():
 
 
 def modifySupperlierClicked():
-    pass
+    def ModifySupplier():
+        if supplierNameEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อร้าน/สวน")
+            supplierNameEnt.focus_force()
+        elif supplierNameEnt.get().isnumeric() == True:
+            messagebox.showerror("Admin:", "ชื่อสินค้าร้าน/สวน ไม่ถูกต้อง")
+            supplierNameEnt.focus_force()
+        elif contactNameEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อผู้ติดต่อ")
+            contactNameEnt.focus_force()
+        elif contactNameEnt.get().isnumeric() == True:
+            messagebox.showerror("Admin:", "ชื่อผู้ติดต่อไม่ถูกต้อง")
+            contactNameEnt.focus_force()
+        elif phoneEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่เบอร์โทรศัพท์ติดต่อ")
+            phoneEnt.focus_force()
+        elif phoneEnt.get().replace('-', '').isnumeric() == False or (len(phoneEnt.get().replace('-', '')) != 10 and len(phoneEnt.get().replace('-', '')) != 9):
+            messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
+            phoneEnt.focus_force()
+        else:
+            isValid = True
+            sql = "SELECT supplierName, supplierID FROM SupplierContactTable"
+            cursor.execute(sql)
+            res = cursor.fetchall()
+            for i in range(len(res)):
+                if res[i][0] == supplierNameEnt.get() and res[i][1] != selectedSupp_id:
+                    messagebox.showerror("Admin:","มีผู้ค้าส่งนี้อยู่ในฐานระบบแล้ว")
+                    isValid = False
+                    break
+            
+            if isValid:
+                sql = "UPDATE SupplierContactTable SET supplierName = ?, contactName = ?, phone = ? WHERE supplierID = ?"
+                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get().replace('-',''), selectedSupp_id])
+                conn.commit()
+                messagebox.showinfo("Admin:", "แก้ไขผู้ค้าส่งเรียบร้อยแล้ว")
+                modifyWindow.destroy()
+                fetchSupplierTree()
+            else:
+                supplierNameEnt.focus_force()
+
+    if supplierTree.focus() == "":
+        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะแก้ไข")
+    else:
+        selectedSupp = supplierTree.item(supplierTree.focus(), "values")
+        selectedSupp_id = int(selectedSupp[0])
+        selectedSupp_name = selectedSupp[1]
+        selectedSupp_contact = selectedSupp[2]
+        selectedSupp_phone = selectedSupp[3]
+
+        w = 500
+        h = 500
+        modifyWindow = Toplevel(root)
+        modifyWindow.title("แก้ไขผู้ค้าส่ง")
+        modifyWindow.rowconfigure(0, weight=1)
+        modifyWindow.columnconfigure(0, weight=1)
+        x = root.winfo_screenwidth() / 2 - w / 2
+        y = root.winfo_screenheight() / 2 - h / 2
+        modifyWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+        modifyFrame = Frame(modifyWindow, bg="white")
+        modifyFrame.rowconfigure((0,1,2,3), weight=1) #type: ignore
+        modifyFrame.columnconfigure((0,1), weight=1)  # type: ignore
+        modifyFrame.grid(row=0, column=0, sticky="news")
+
+        Label(modifyFrame, text="ชื่อร้าน/สวน:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+        supplierNameEnt = Entry(modifyFrame, width=20)
+        supplierNameEnt.insert(END, selectedSupp_name)
+        supplierNameEnt.grid(row=0, column=1, sticky='w')
+
+        Label(modifyFrame, text="ชื่อผู้ติดต่อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+        contactNameEnt = Entry(modifyFrame, width=20)
+        contactNameEnt.insert(END, selectedSupp_contact)
+        contactNameEnt.grid(row=1, column=1, sticky='w')
+
+        Label(modifyFrame, text="เบอร์โทรศัพท์:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+        phoneEnt = Entry(modifyFrame, width=20)
+        phoneEnt.insert(END, selectedSupp_phone)
+        phoneEnt.grid(row=2, column=1, sticky='w')
+
+        Button(modifyFrame, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifySupplier).grid(row=3, columnspan=2)
 
 
 def deleteSupplierClicked():
     if supplierTree.focus() == "":
-        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค่าส่งที่ต้องการจะลบที่ต้องการจะลบ")
+        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะลบที่ต้องการจะลบ")
     else:
-        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค่าส่งนี้หรือไม่นี้หรือไม่", icon="warning")
+        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค้าส่งนี้หรือไม่นี้หรือไม่", icon="warning")
         if msg == "yes":
             selectedSupp = supplierTree.item(supplierTree.focus(), "values")
             selectedSupp_id= selectedSupp[0]
@@ -539,7 +618,6 @@ def deleteSupplierClicked():
             conn.commit()
             messagebox.showinfo("Admin:", "ผู้ค้าส่งถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว")
             fetchSupplierTree()
-
 
 
 w = 1024
