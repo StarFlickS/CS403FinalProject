@@ -59,7 +59,7 @@ def LoginPage():
     # loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=loginclicked)
     loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", border=1, command=MainPage)
     loginBtn.grid(row=0, column=0)
-
+    x = 10
 
 def loginclicked():
     if usernameSpy.get() == "":
