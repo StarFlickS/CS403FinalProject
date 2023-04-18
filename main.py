@@ -86,7 +86,7 @@ def loginclicked():
 
 
 def MainPage():
-    global infoFrame, warehouseBtn
+    global infoFrame, warehouseBtn, supplierManagementBtn
     mainpageFrame = Frame(root, bg="black")
     mainpageFrame.rowconfigure(0, weight=1)
     mainpageFrame.columnconfigure(0, weight=1)
@@ -106,6 +106,11 @@ def MainPage():
     # คลังสินค้า
     warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
     warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
+
+    # จัดการผู้ค่าส่ง
+    supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค่าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
+    supplierManagementBtn.grid(row=1, columnspan=2, sticky="news")
+
     # Logout Button
     Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=9, column=0)
     # Exit Button
@@ -161,7 +166,6 @@ def warehouseClicked():
 
 
     warehouseTree.grid(row=0, column=0)
-    fetchTree()
 
     # Add Button
     Button(middle, text="เพิ่มสินค้า", fg="black", bg="green", borderless=1, command=addProductClicked).grid(row=0, column=0, sticky='ne', padx=60, pady=170)
@@ -172,8 +176,10 @@ def warehouseClicked():
     #Delete Button
     Button(middle, text="ลบสินค้า", fg="black", bg="red", borderless=1, command=deleteProductClicked).grid(row=0, column=0, sticky='se', padx=60, pady=170)
     
+    fetchWarehouseTree()
+    
 
-def fetchTree():
+def fetchWarehouseTree():
     warehouseTree.delete(*warehouseTree.get_children())
     sql = "SELECT * FROM WareHouseTable"
     cursor.execute(sql)
@@ -228,7 +234,7 @@ def addProductClicked():
                 conn.commit()
                 messagebox.showinfo("Admin:", "สินค้าใหม่ได้ถูกเพิ่มเข้าคลังแล้ว")
                 addProductWindow.destroy()
-                fetchTree()
+                fetchWarehouseTree()
             else:
                 prodnameEnt.focus_force()
 
@@ -281,7 +287,7 @@ def deleteProductClicked():
             cursor.execute(sql, [selectedProd_id])
             conn.commit()
             messagebox.showinfo("Admin:", "สินค้าถูกลบออกจากคลังเรียบร้อยแล้ว")
-            fetchTree()
+            fetchWarehouseTree()
 
 
 def modifyProductClicked():
@@ -329,7 +335,7 @@ def modifyProductClicked():
                 conn.commit()
                 messagebox.showinfo("Admin:", "แก้ไขสินค้าเรียบร้อยแล้ว")
                 modifyWindow.destroy()
-                fetchTree()
+                fetchWarehouseTree()
             else:
                 prodnameEnt.focus_force()
 
@@ -380,6 +386,160 @@ def modifyProductClicked():
         prodQuantityEnt.grid(row=3, column=1, sticky='w')
 
         Button(modifyFrame, text="แก้ไขสินค้า", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyProduct).grid(row=4, columnspan=2)
+
+
+def supplierManagementClicked():
+    global supplierTree
+    clearInfoFrame()
+    supplierManagementBtn["fg"] = "blue"
+    supplierManageFrame = Frame(infoFrame, bg="white")
+    supplierManageFrame.rowconfigure(0, weight=1) # type: ignore
+    supplierManageFrame.rowconfigure(1, weight=5)
+    supplierManageFrame.columnconfigure(0, weight=1)
+    supplierManageFrame.grid(row=0, column=0, sticky="news")
+
+    top = Frame(supplierManageFrame, bg="white")
+    top.rowconfigure(0, weight=1)
+    top.columnconfigure(0, weight=1)
+    top.grid(row=0, column=0, sticky="news")
+
+    middle = Frame(supplierManageFrame, bg="white")
+    middle.rowconfigure(0, weight=1) #type: ignore
+
+    middle.columnconfigure(0, weight=1)
+    middle.grid(row=1, column=0, sticky="news")
+
+    #header
+    Label(top, text="ผู้ค่าส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+
+    supplierTree = ttk.Treeview(middle)
+    supplierTree.column("#0", width=0, stretch=NO)
+    supplierTree["columns"] = ("รหัสผู้ค่าส่ง","ชื่อร้าน/สวน", "ชื่อผู้ติดต่อ", "เบอร์โทรศัพท์")
+
+    supplierTree.column("รหัสผู้ค่าส่ง", width=100, anchor=CENTER)
+    supplierTree.column("ชื่อร้าน/สวน", width=100, anchor=CENTER)
+    supplierTree.column("ชื่อผู้ติดต่อ", width=120, anchor=E)
+    supplierTree.column("เบอร์โทรศัพท์", width=120, anchor=E)
+
+    supplierTree.heading("รหัสผู้ค่าส่ง", text="รหัสผู้ค่าส่ง")
+    supplierTree.heading("ชื่อร้าน/สวน", text="ชื่อร้าน/สวน")
+    supplierTree.heading("ชื่อผู้ติดต่อ", text="ชื่อผู้ติดต่อ")
+    supplierTree.heading("เบอร์โทรศัพท์", text="เบอร์โทรศัพท์")
+
+    supplierTree.grid(row=0, column=0)
+
+    # Add Button
+    Button(middle, text="เพิ่มผู้ค่าส่ง", fg="black", bg="green", borderless=1, command=addSupplierClicked).grid(row=0, column=0, sticky='ne', padx=180, pady=170)
+
+    # Modify Button
+    Button(middle, text="แก้ไขผู้ค่าส่ง", fg="black", bg="yellow", borderless=1, command=modifySupperlierClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
+
+    #Delete Button
+    Button(middle, text="ลบผู้ค่าส่ง", fg="black", bg="red", borderless=1, command=deleteSupplierClicked).grid(row=0, column=0, sticky='se', padx=180, pady=170)
+    
+    fetchSupplierTree()
+    
+
+def fetchSupplierTree():
+    supplierTree.delete(*supplierTree.get_children())
+    sql = "SELECT * FROM SupplierContactTable"
+    cursor.execute(sql)
+    res = cursor.fetchall()
+    if res:
+        for i in range(len(res)):
+            warehouseTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][3]))
+
+
+def addSupplierClicked():
+    def AddSupplier():
+        if supplierNameEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อร้าน/สวน")
+            supplierNameEnt.focus_force()
+        elif supplierNameEnt.get().isnumeric() == True:
+            messagebox.showerror("Admin:", "ชื่อร้าน/สวนไม่สามารถเป็นตัวเลขได้")
+            supplierNameEnt.focus_force()
+        elif contactNameEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อผู้ติดต่อ")
+            contactNameEnt.focus_force()
+        elif contactNameEnt.get().isnumeric() == True:
+            messagebox.showerror("Admin:", "ชื่อผู้ติดต่อไม่ถูกต้อง")
+            contactNameEnt.focus_force()
+        elif phoneEnt.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่เบอร์โทรศัพท์")
+            phoneEnt.focus_force()
+        elif phoneEnt.get().replace('-', '',3).isnumeric() == False or len(phoneEnt.get().replace('-', '',3)) != 10  or len(phoneEnt.get().replace('-', '',3)) != 9:
+            messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
+            phoneEnt.focus_force()
+        else:
+            isValid = True
+            sql = "SELECT supplierName FROM SupplierContactTable"
+            cursor.execute(sql)
+            res = cursor.fetchall()
+            for i in range(len(res)):
+                if res[i][0] == supplierNameEnt.get():
+                    messagebox.showerror("Admin:","มีค้าส่งรายนี้ในฐานข้อมูลแล้ว")
+                    isValid = False
+                    break
+            
+            if isValid:
+                sql = "INSERT INTO SupplierContactTable (supplierName, contactName, phone) VALUES (?,?,?)"
+                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get()])
+                conn.commit()
+                messagebox.showinfo("Admin:", "สินค้าใหม่ได้ถูกเพิ่มเข้าคลังแล้ว")
+                addSupplierWindow.destroy()
+                fetchSupplierTree()
+            else:
+                supplierNameEnt.focus_force()
+    
+    w = 500
+    h = 500
+    addSupplierWindow = Toplevel(root)
+    addSupplierWindow.title("เพิ่มผู้ค่าส่งใหม่")
+    addSupplierWindow.rowconfigure(0, weight=1)
+    addSupplierWindow.columnconfigure(0, weight=1)
+    x = root.winfo_screenwidth() / 2 - w / 2
+    y = root.winfo_screenheight() / 2 - h / 2
+    addSupplierWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+    addSupplierFrame = Frame(addSupplierWindow, bg="white")
+    addSupplierFrame.rowconfigure((0,1,2,3), weight=1) #type: ignore
+    addSupplierFrame.columnconfigure((0,1), weight=1)  # type: ignore
+    addSupplierFrame.grid(row=0, column=0, sticky="news")
+
+    Label(addSupplierFrame, text="ชื่อร้าน/สวน:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+    supplierNameEnt = Entry(addSupplierFrame, width=20)
+    supplierNameEnt.grid(row=0, column=1, sticky='w')
+
+    Label(addSupplierFrame, text="ชื่อผู้ติดต่อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+    contactNameEnt = Entry(addSupplierFrame, width=20)
+    contactNameEnt.grid(row=1, column=1, sticky='w')
+
+    Label(addSupplierFrame, text="เบอร์โทรสัพท์ติดต่อ:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+    phoneEnt = Entry(addSupplierFrame, width=20)
+    phoneEnt.grid(row=2, column=1, sticky='w')
+
+    Button(addSupplierFrame, text="เพิ่มผู้ค้าส่ง", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddSupplier).grid(row=3, columnspan=2)
+
+
+def modifySupperlierClicked():
+    pass
+
+
+def deleteSupplierClicked():
+    if supplierTree.focus() == "":
+        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค่าส่งที่ต้องการจะลบที่ต้องการจะลบ")
+    else:
+        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค่าส่งนี้หรือไม่นี้หรือไม่", icon="warning")
+        if msg == "yes":
+            selectedSupp = supplierTree.item(supplierTree.focus(), "values")
+            selectedSupp_id= selectedSupp[0]
+            sql = '''DELETE FROM SupplierContactTable
+                        WHERE supplierID = ?'''
+            cursor.execute(sql, [selectedSupp_id])
+            conn.commit()
+            messagebox.showinfo("Admin:", "ผู้ค้าส่งถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว")
+            fetchSupplierTree()
+
 
 
 w = 1024
