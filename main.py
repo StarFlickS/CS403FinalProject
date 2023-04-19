@@ -1,6 +1,3 @@
-'''
-ควย
-'''
 import sqlite3
 from tkinter import *
 from tkinter import messagebox
@@ -79,7 +76,7 @@ def loginclicked():
                 if result:
                     messagebox.showinfo("Admin:", "เข้าสู่ระบบสำเร็จ")
                     global permission
-                    permission = result[3]
+                    permission = result[4]
                     MainPage()
                 else:
                     messagebox.showerror("Admin:", "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง")
@@ -89,11 +86,11 @@ def loginclicked():
 
 
 def MainPage():
-    global infoFrame, warehouseBtn, supplierManagementBtn
+    global infoFrame, btnlist, warehouseBtn, supplierManagementBtn, productSearchBtn, intelInvestigateBtn, saveIntelBtn, printReportBtn, purchaseManagementBtn
     mainpageFrame = Frame(root, bg="black")
     mainpageFrame.rowconfigure(0, weight=1)
-    mainpageFrame.columnconfigure(0, weight=1)
-    mainpageFrame.columnconfigure(1, weight=5)
+    mainpageFrame.columnconfigure(0, weight=2)
+    mainpageFrame.columnconfigure(1, weight=20)
     mainpageFrame.grid(row=0,rowspan=3, column=0, columnspan=3, sticky="news")
 
     menuFrame = Frame(mainpageFrame, bg="gray")
@@ -114,18 +111,23 @@ def MainPage():
     supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค้าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
     supplierManagementBtn.grid(row=1, columnspan=2, sticky="news")
 
+    # จัดการข้อมูลการสั่งซื้อ
+    purchaseManagementBtn = Button(menuFrame, text="เพิ่ม/แก้ไขข้อมูลการสั่งซื้อ", bg="gray", fg="white", borderless=1, command=purchaseManagementClicked)
+    purchaseManagementBtn.grid(row=2, columnspan=2, sticky="news")
+
+
     # ค้นหาสินค้า
-    productSearchBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="black", bg="white", command=productsearchClicked)
+    productSearchBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="white", bg="gray", command=productsearchClicked, borderless=1)
     productSearchBtn.grid(row=3, column=0, columnspan=2, sticky="news")
     # ตรวจสอบข้อมูล
-    intelInvestigateBtn = Button(menuFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="black", bg="white", command=intelinvestigateClicked)
+    intelInvestigateBtn = Button(menuFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="white", bg="gray", command=intelinvestigateClicked, borderless=1)
     intelInvestigateBtn.grid(row=4, column=0, columnspan=2, sticky="news")
     # บันทึกข้อมูลจัดส่ง
-    saveIntelBtn = Button(menuFrame, text="บันทึกข้อมูลการจัดส่ง", fg="black", bg="white", command=saveintelClicked)
+    saveIntelBtn = Button(menuFrame, text="บันทึกข้อมูลการจัดส่ง", fg="white", bg="gray", command=saveintelClicked, borderless=1)
     saveIntelBtn.grid(row=5, column=0, columnspan=2, sticky="news")
 
     # จัดพิมพ์รายงานเเสดงผลการดำเนินงาน
-    printReportBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="black", bg="white", command=printreportClicked)
+    printReportBtn = Button(menuFrame, text="จัดพิมพ์รายงาน", fg="white", bg="gray", command=printreportClicked,borderless=1)
     printReportBtn.grid(row=6, column=0, columnspan=2, sticky="news")
 
     # Logout Button
@@ -133,14 +135,22 @@ def MainPage():
     # Exit Button
     Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=9, column=1)
 
+    btnlist = [warehouseBtn, supplierManagementBtn, productSearchBtn, intelInvestigateBtn, saveIntelBtn, printReportBtn, purchaseManagementBtn]
+
 
 def clearInfoFrame():
     for widget in infoFrame.winfo_children():
         widget.destroy()
 
 
+def resetBtnColor():
+    for i in range(len(btnlist)):
+        btnlist[i]["fg"] = "white"
+
+
 def warehouseClicked():
     global warehouseTree
+    resetBtnColor()
     clearInfoFrame()
     warehouseBtn["fg"] = "blue"
     warehouseFrame = Frame(infoFrame, bg="white")
@@ -218,19 +228,19 @@ def addProductClicked():
             messagebox.showerror("Admin:", "กรุณาใส่ราคาต้นทุน")
             prodCostEnt.focus_force()
         elif prodCostEnt.get().replace('.', '',1).isnumeric() == False:
-            messagebox.showerror("Admin:", "ราคาต้นทุนต้องเป็นตัวเลขเท่านั้น")
+            messagebox.showerror("Admin:", "ราคาต้นทุนต้องเป็นจำนวนเต็มบวกเท่านั้น")
             prodCostEnt.focus_force()
         elif prodPriceEnt.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ราคาขาย")
             prodPriceEnt.focus_force()
         elif prodPriceEnt.get().replace('.', '',1).isnumeric() == False:
-            messagebox.showerror("Admin:", "ราคาขายต้องเป็นตัวเลขเท่านั้น")
+            messagebox.showerror("Admin:", "ราคาขายต้องเป็นจำนวนเต็มบวกเท่านั้น")
             prodPriceEnt.focus_force()
         elif prodQuantityEnt.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ปริมาณในคลัง")
             prodQuantityEnt.focus_force()
         elif prodQuantityEnt.get().isnumeric() == False:
-            messagebox.showerror("Admin:", "ปริมาณในคลังต้องเป็นตัวเลขจำนวนเต็มเท่านั้นเท่านั้น")
+            messagebox.showerror("Admin:", "ปริมาณในคลังต้องเป็นตัวเลขจำนวนเต็มบวกเท่านั้นเท่านั้น")
             prodQuantityEnt.focus_force()
         else:
             isValid = True
@@ -245,7 +255,7 @@ def addProductClicked():
             
             if isValid:
                 today = date.today()
-                d = today.strftime("%m/%d/%y")
+                d = today.strftime("%d/%m/%y")
                 sql = "INSERT INTO WareHouseTable (productName, cost, price, quantity, date) VALUES (?,?,?,?,?)"
                 cursor.execute(sql, [prodnameSpy.get(), prodCostEnt.get(), prodPriceEnt.get(), prodQuantityEnt.get(), d])
                 conn.commit()
@@ -346,7 +356,7 @@ def modifyProductClicked():
             
             if isValid:
                 today = date.today()
-                d = today.strftime("%m/%d/%y")
+                d = today.strftime("%d/%m/%y")
                 sql = "UPDATE WareHouseTable SET productName = ?, cost = ?, price = ?, quantity = ?, date = ? WHERE productID = ?"
                 cursor.execute(sql, [prodnameSpy.get(), prodCostEnt.get(), prodPriceEnt.get(), prodQuantityEnt.get(), d, selectedProd_id])
                 conn.commit()
@@ -407,6 +417,7 @@ def modifyProductClicked():
 
 def supplierManagementClicked():
     global supplierTree
+    resetBtnColor()
     clearInfoFrame()
     supplierManagementBtn["fg"] = "blue"
     supplierManageFrame = Frame(infoFrame, bg="white")
@@ -427,7 +438,7 @@ def supplierManagementClicked():
     middle.grid(row=1, column=0, sticky="news")
 
     #header
-    Label(top, text="ผู้ค้าส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+    Label(top, text="แก้ไข/บันทึกผู้ค้าส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
 
     supplierTree = ttk.Treeview(middle)
     supplierTree.column("#0", width=0, stretch=NO)
@@ -640,7 +651,9 @@ def deleteSupplierClicked():
 
 def productsearchClicked() :
     global prodSearchFrame, searchBar
+    resetBtnColor()
     clearInfoFrame()
+    productSearchBtn["fg"] = "blue"
     prodSearchFrame = Frame(infoFrame, bg="yellow")
     prodSearchFrame.rowconfigure(0, weight=1)
     prodSearchFrame.rowconfigure(1, weight=3)
@@ -686,7 +699,9 @@ def fetchProdSearchedTree():
 
 
 def intelinvestigateClicked() :
+    resetBtnColor()
     clearInfoFrame()
+    intelInvestigateBtn["fg"] = "blue"
     intelinvestigateFrame = Frame(infoFrame, bg="gray")
     intelinvestigateFrame.rowconfigure((0, 1), weight=1)
     intelinvestigateFrame.columnconfigure((0, 1), weight=1)
@@ -722,7 +737,9 @@ def intelinvestigateClicked() :
 
 
 def saveintelClicked() :
+    resetBtnColor()
     clearInfoFrame()
+    saveIntelBtn["fg"] = "blue"
     saveIntelFrame = Frame(infoFrame, bg="cyan")
     saveIntelFrame.columnconfigure((0, 1, 2), weight=1)
     saveIntelFrame.rowconfigure((0, 2), weight=1)
@@ -769,7 +786,9 @@ def saveintelClicked() :
 
 
 def printreportClicked() :
+    resetBtnColor()
     clearInfoFrame()
+    printReportBtn["fg"] = "blue"
     printReportFrame = Frame(infoFrame, bg="lime")
     printReportFrame.rowconfigure((0, 2), weight=1)
     printReportFrame.rowconfigure(1, weight=3)
@@ -816,6 +835,304 @@ def saveClicked() :
 def printClicked() :
     return
 
+
+def purchaseManagementClicked():
+    global purchaseTree
+    resetBtnColor()
+    clearInfoFrame()
+    purchaseManagementBtn["fg"] = "blue"
+    purchaseMangementFrame = Frame(infoFrame, bg="white")
+    purchaseMangementFrame.grid(row=0, column=0, sticky="news")
+
+    purchaseMangementFrame.rowconfigure(0, weight=1) # type: ignore
+    purchaseMangementFrame.rowconfigure(1, weight=5)
+    purchaseMangementFrame.columnconfigure(0, weight=1)
+    purchaseMangementFrame.grid(row=0, column=0, sticky="news")
+
+    top = Frame(purchaseMangementFrame, bg="white")
+    top.rowconfigure(0, weight=1)
+    top.columnconfigure(0, weight=1)
+    top.grid(row=0, column=0, sticky="news")
+
+    middle = Frame(purchaseMangementFrame, bg="white")
+    middle.rowconfigure(0, weight=1) #type: ignore
+
+    middle.columnconfigure(0, weight=1)
+    middle.grid(row=1, column=0, sticky="news")
+
+    #header
+    Label(top, text="เพิ่ม/แก้ไขข้อมูลการสั่งซื้อ", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+
+    purchaseTree = ttk.Treeview(middle)
+    purchaseTree.column("#0", width=0, stretch=NO)
+    purchaseTree["columns"] = ("รหัสสั่งซื้อ","วันที่สั่งซื้อ", "ชื่อผู้สั่งซื้อ", "ชื่อผู้ค้าส่ง", "รายการสินค้า", "ปริมาณการสั่งซื้อ", "ราคาซื้อต่อหน่วย", "สถานะ")
+
+    purchaseTree.column("รหัสสั่งซื้อ", width=100, anchor=CENTER)
+    purchaseTree.column("วันที่สั่งซื้อ", width=100, anchor=CENTER)
+    purchaseTree.column("ชื่อผู้สั่งซื้อ", width=100, anchor=E)
+    purchaseTree.column("ชื่อผู้ค้าส่ง", width=100, anchor=E)
+    purchaseTree.column("รายการสินค้า", width=100, anchor=E)
+    purchaseTree.column("ปริมาณการสั่งซื้อ", width=100, anchor=E)
+    purchaseTree.column("ราคาซื้อต่อหน่วย", width=100, anchor=E)
+    purchaseTree.column("สถานะ", width=100, anchor=CENTER)
+
+    purchaseTree.heading("รหัสสั่งซื้อ", text="รหัสสั่งซื้อ")
+    purchaseTree.heading("วันที่สั่งซื้อ", text="วันที่สั่งซื้อ")
+    purchaseTree.heading("ชื่อผู้สั่งซื้อ", text="ชื่อผู้สั่งซื้อ")
+    purchaseTree.heading("ชื่อผู้ค้าส่ง", text="ชื่อผู้ค้าส่ง")
+    purchaseTree.heading("รายการสินค้า", text="รายการสินค้า")
+    purchaseTree.heading("ปริมาณการสั่งซื้อ", text="ปริมาณการสั่งซื้อ")
+    purchaseTree.heading("ราคาซื้อต่อหน่วย", text="ราคาซื้อต่อหน่วย")
+    purchaseTree.heading("สถานะ", text="สถานะ")
+
+    purchaseTree.grid(row=0, column=0)
+
+    # Add Button
+    Button(middle, text="สร้างรายการสั่งซื้อใหม่", fg="black", bg="green", borderless=1, command=addPurchaseClicked).grid(row=0, column=0, sticky='ne', padx=15, pady=170)
+
+    # Modify Button
+    Button(middle, text="แก้ไขคำสั่งซื้อ", fg="black", bg="yellow", borderless=1, command=modifyProductClicked).grid(row=0, column=0, sticky='se', padx=160, pady=170)
+
+    # Confirm Button
+    Button(middle, text="ยืนยันคำสั่งซื้อ", fg="black", bg="green", borderless=1, command=modifyProductClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
+
+    #Delete Button
+    Button(middle, text="ลบ/ยกเลิกคำสั่งซื้อ", fg="black", bg="red", borderless=1, command=deletePurchaseClicked).grid(row=0, column=0, sticky='se', padx=15, pady=170)
+    
+
+    fetchPurchaseTree()
+
+
+def fetchPurchaseTree():
+    purchaseTree.delete(*purchaseTree.get_children())
+    sql = "SELECT * FROM PurchaseOrderTable"
+    cursor.execute(sql)
+    res = cursor.fetchall()
+    if res:
+        for i in range(len(res)):
+            status = "กำลังดำเนินการ"
+            if res[i][7] == 1:
+                status = "ดำเนินการเรียบร้อยแล้ว"
+            purchaseTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][3], res[i][4], res[i][5], res[i][6], status))
+
+
+def deletePurchaseClicked():
+    if purchaseTree.focus() == "":
+        messagebox.showerror("Admin:", "กรุณาเลือกคำสั่งซื้อที่ต้องการจะลบหรือยกเลิก")
+    else:
+        msg = messagebox.askquestion("Delete", "ต้องการลบ/ยกเลิกคำสั่งซื้อนี้หรือไม่", icon="warning")
+        if msg == "yes":
+            selectedProd = purchaseTree.item(purchaseTree.focus(), "values")
+            selectedProd_id = selectedProd[0]
+            sql = '''DELETE FROM PurchaseOrderTable
+                        WHERE orderID = ?'''
+            cursor.execute(sql, [selectedProd_id])
+            conn.commit()
+            messagebox.showinfo("Admin:", "คำสั่งซื้อถูกลบ/ยกเลิกเรียบร้อยแล้ว")
+            fetchPurchaseTree()
+
+
+def addPurchaseClicked():
+    def AddPurchaseOrder():
+        if ordererNameCombo.get() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกผู้สั่งซื้อ")
+            ordererNameCombo.focus_force()
+        elif supplierCombo.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ผู้ค้าส่ง")
+            supplierCombo.focus_force()
+        elif infoTree.get_children() == ():
+            messagebox.showerror("Admin:", "ไม่มีรายการสินค้าที่ต้องการจะสั่งซื้อ")
+        else:
+            pass
+
+    
+    def getOrdererNames():
+        returnlist = []
+        sql = "SELECT name FROM LoginTable WHERE permission = 0"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                returnlist.append(res[i][0])
+        return returnlist
+    
+
+    def getSupplier():
+        returnlist = []
+        sql = "SELECT supplierName FROM SupplierContactTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                returnlist.append(res[i][0])
+        return returnlist
+
+    def getProduct():
+        sql = "SELECT * FROM WareHouseTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            return res
+        
+    
+    def fetchinfoTree():
+        infoTree.delete(*infoTree.get_children())
+        for i in range(len(orderProdlist)):
+            infoTree.insert("",END, values=(orderProdlist[i][0],orderProdlist[i][1],orderProdlist[i][2],orderProdlist[i][3]))
+        
+
+    def addProductlist():
+        def fetchWarehouseTree():
+            alreadyAddedId = [int(orderProdlist[i][0]) for i in range(len(orderProdlist))]
+            warehouseTree.delete(*warehouseTree.get_children())
+            sql = "SELECT * FROM WareHouseTable"
+            cursor.execute(sql)
+            res = cursor.fetchall()
+            if res:
+                for i in range(len(res)):
+                    if res[i][0] not in alreadyAddedId:
+                        warehouseTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][4]))
+        
+        
+        def warehouseTreeclicked(event):
+            selected_prod = warehouseTree.item(warehouseTree.focus(), "values")
+            costEnt.delete(0, END)
+            costEnt.insert(END, selected_prod[2])
+
+
+        def addToProductListClicked():
+            if warehouseTree.focus() == "":
+                messagebox.showerror("Admin:", "เลือกสินค้าที่ต้องการเพิ่มลงในรายการสั่งซื้อ")
+            elif costEnt.get() == "" or costEnt.get().replace('.', '',1).isnumeric() == False:
+                messagebox.showerror("Admin:", "ราคาซื้อต่อหน่วยต้องเป็นจำนวนจริงเท่านั้น")
+                costEnt.focus_force()
+            elif orderQuantityEnt.get() == "" or orderQuantityEnt.get().isnumeric() == False:
+                messagebox.showerror("Admin:", "ปริมาณสั่งซื้อต้องเป็นจำนวนเต็มบวกเท่านั้น")
+                orderQuantityEnt.focus_force()
+            else:
+                selected_prod = warehouseTree.item(warehouseTree.focus(), "values")
+                info = (selected_prod[0], selected_prod[1], costEnt.get(), orderQuantityEnt.get())
+                info = tuple(info)
+                orderProdlist.append(info)
+                warehouseTree.delete(warehouseTree.focus())
+                costEnt.delete(0, END)
+                orderQuantityEnt.delete(0, END)
+                messagebox.showinfo("Admin:", "เพิ่มสินค้าดังกล่าวลงในรายการสั่งซื้อแล้ว")
+        
+        
+        def confirmClicked():
+            addProductlistWindow.destroy()
+            fetchinfoTree()
+        
+        w = 600
+        h = 500
+        addProductlistWindow = Toplevel(root)
+        addProductlistWindow.title("รายการสินค้า")
+        addProductlistWindow.rowconfigure(0, weight=1)
+        addProductlistWindow.columnconfigure(0, weight=1)
+        x = root.winfo_screenwidth() / 2 - w / 2
+        y = root.winfo_screenheight() / 2 - h / 2
+        addProductlistWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+        
+        addProductListFrame = Frame(addProductlistWindow, bg="white")
+        addProductListFrame.columnconfigure(0, weight=1)
+        addProductListFrame.rowconfigure((0,1), weight=1) # type: ignore
+        addProductListFrame.grid(row=0, column=0, sticky="news")
+
+        top = Frame(addProductListFrame, bg="white")
+        top.rowconfigure((0,1), weight=1) # type: ignore
+        top.columnconfigure((0,1), weight=1) # type: ignore
+        top.grid(row=0, column=0, sticky="news")
+        
+        bot = Frame(addProductListFrame, bg="white")
+        bot.rowconfigure((0,1), weight=1) # type: ignore
+        bot.columnconfigure(0, weight=1)
+        bot.grid(row=1, column=0, sticky="news")
+
+        Label(top, text="ราคาซื้อต่อหน่วย:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+        costEnt = Entry(top, width=20)
+        costEnt.grid(row=0, column=1, sticky='w')
+
+        Label(top, text="ปริมาณที่สั่งซื้อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+        orderQuantityEnt = Entry(top, width=20)
+        orderQuantityEnt.grid(row=1, column=1, sticky='w')
+
+        warehouseTree = ttk.Treeview(bot)
+        warehouseTree.column("#0", width=0, stretch=NO)
+        warehouseTree["columns"] = ("รหัสสินค้า","ชื่อสินค้า", "ราคาต้นทุนต่อหน่วย", "ปริมาณคงเหลือ")
+
+        warehouseTree.column("รหัสสินค้า", width=100, anchor=CENTER)
+        warehouseTree.column("ชื่อสินค้า", width=100, anchor=CENTER)
+        warehouseTree.column("ราคาต้นทุนต่อหน่วย", width=120, anchor=E)
+        warehouseTree.column("ปริมาณคงเหลือ", width=120, anchor=E)
+
+        warehouseTree.heading("รหัสสินค้า", text="รหัสสินค้า")
+        warehouseTree.heading("ชื่อสินค้า", text="ชื่อสินค้า")
+        warehouseTree.heading("ราคาต้นทุนต่อหน่วย", text="ราคาต้นทุนต่อหน่วย")
+        warehouseTree.heading("ปริมาณคงเหลือ", text="ปริมาณคงเหลือ")
+        warehouseTree.grid(row=0, column=0)
+
+        warehouseTree.bind('<Double-1>', warehouseTreeclicked)
+
+        fetchWarehouseTree()
+
+        Button(bot, text="เพิ่มรายการสินค้า", fg="black", bg="green", borderless=1, command=addToProductListClicked).grid(row=1, column=0, sticky='e', padx=120)
+        
+        Button(bot, text="ยืนยัน", fg="black", bg="green", borderless=1, command=confirmClicked).grid(row=1, column=0, sticky='e', padx=20)
+
+
+    orderProdlist = []
+
+    w = 500
+    h = 500
+    addPurchaseWindow = Toplevel(root)
+    addPurchaseWindow.title("สร้างรายการสั่งซื้อใหม่")
+    addPurchaseWindow.rowconfigure(0, weight=1)
+    addPurchaseWindow.columnconfigure(0, weight=1)
+    x = root.winfo_screenwidth() / 2 - w / 2
+    y = root.winfo_screenheight() / 2 - h / 2
+    addPurchaseWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+    addPurchaseFrame = Frame(addPurchaseWindow, bg="white")
+    addPurchaseFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
+    addPurchaseFrame.columnconfigure((0,1), weight=1)  # type: ignore
+    addPurchaseFrame.grid(row=0, column=0, sticky="news")
+
+    names = getOrdererNames()
+    suppliers = getSupplier()
+
+    Label(addPurchaseFrame, text="ผู้สั่งซื้อ:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+    ordererNameCombo = ttk.Combobox(addPurchaseFrame, values=names, state="readonly")
+    ordererNameCombo.grid(row=0, column=1, sticky='w')
+
+    Label(addPurchaseFrame, text="ผู้ค้าส่ง:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+    supplierCombo = ttk.Combobox(addPurchaseFrame, values=suppliers, state="readonly")
+    supplierCombo.grid(row=1, column=1, sticky='w')
+
+    Label(addPurchaseFrame, text="รายการสินค้า:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+    Button(addPurchaseFrame, text="เลือกรายการสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=addProductlist).grid(row=2, column=1, sticky='w', padx=5)
+
+    infoTree = ttk.Treeview(addPurchaseFrame)
+    infoTree.column("#0", width=0, stretch=NO)
+    infoTree["columns"] = ("รหัสสินค้า","ชื่อสินค้า", "ราคาซื้อต่อหน่วย", "ปริมาณสั่งซื้อ")
+
+    infoTree.column("รหัสสินค้า", width=100, anchor=CENTER)
+    infoTree.column("ชื่อสินค้า", width=100, anchor=CENTER)
+    infoTree.column("ราคาซื้อต่อหน่วย", width=120, anchor=E)
+    infoTree.column("ปริมาณสั่งซื้อ", width=120, anchor=E)
+
+    infoTree.heading("รหัสสินค้า", text="รหัสสินค้า")
+    infoTree.heading("ชื่อสินค้า", text="ชื่อสินค้า")
+    infoTree.heading("ราคาซื้อต่อหน่วย", text="ราคาซื้อต่อหน่วย")
+    infoTree.heading("ปริมาณสั่งซื้อ", text="ปริมาณสั่งซื้อ")
+    infoTree.grid(row=3, columnspan=2)
+
+    fetchinfoTree()
+
+
+    Button(addPurchaseFrame, text="เพิ่มรายการสั่งซื้อ", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddPurchaseOrder).grid(row=4, columnspan=2)
+
+    
 
 w = 1024
 h = 720
