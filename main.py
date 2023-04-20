@@ -57,7 +57,7 @@ def LoginPage():
     bot.columnconfigure(0, weight=1)
     bot.grid(row=2, column=0, sticky="news")
 
-    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=MainPage)
+    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=loginclicked)
     loginBtn.grid(row=0, column=0)
 
 
@@ -224,6 +224,8 @@ def fetchWarehouseTree():
 
 
 def addProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     def AddProduct():
         if prodnameSpy.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ชื่อสินค้า")
@@ -309,6 +311,8 @@ def addProductClicked():
 
 
 def deleteProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     if warehouseTree.focus() == "":
         messagebox.showerror("Admin:", "กรุณาเลือกสินค้าที่ต้องการจะลบ")
     else:
@@ -325,6 +329,8 @@ def deleteProductClicked():
 
 
 def modifyProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     def ModifyProduct():
         if prodnameSpy.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ชื่อสินค้า")
@@ -423,6 +429,8 @@ def modifyProductClicked():
 
 
 def supplierManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global supplierTree
     resetBtnColor()
     clearInfoFrame()
@@ -714,6 +722,8 @@ def fetchProdSearchedTree():
 
 
 def intelinvestigateClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global dateSelectSpy,intelInvestigateTree, searchTypeSpy, intelSearchBar, dayIntelSpy, monthIntelSpy, yearIntelSpy
     resetBtnColor()
     clearInfoFrame()
@@ -871,6 +881,8 @@ def saveintelClicked() :
 
 
 def printreportClicked() :
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     resetBtnColor()
     clearInfoFrame()
     printReportBtn["fg"] = "blue"
@@ -922,6 +934,8 @@ def printClicked() :
 
 
 def purchaseManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global purchaseTree
     resetBtnColor()
     clearInfoFrame()
@@ -1954,6 +1968,8 @@ def sellManagementClicked():
 
 
 def accountManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     def addAccountClicked():
         def AddAccout():
             if fullnameEnt.get() == "":
