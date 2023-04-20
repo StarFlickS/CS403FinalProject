@@ -1909,7 +1909,5 @@ pwdSpy = StringVar()
 
 warehouseIsopen = False
 
-print("Hello")
-
 LoginPage()
 root.mainloop()
