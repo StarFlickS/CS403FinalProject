@@ -1195,7 +1195,7 @@ def addPurchaseClicked():
     infoTree.grid(row=4, columnspan=2)
 
     fetchinfoTree()
-    totalCost = getTotalCost()
+    totalCost = getTotalCost(orderProdlist)
 
     totalLabel = Label(addPurchaseFrame, text="ค่าใช้จ่าย: " + str(totalCost) + " บาท", fg="red", bg="white", font="verdana 20 bold")
     totalLabel.grid(row=5, columnspan=2)
@@ -1205,7 +1205,38 @@ def addPurchaseClicked():
 
 
 def modifyPurchaseClicked():
-    def modifyProductlist():
+    def ModifyPurchaseOrder():
+        if infoTree.get_children() == ():
+            messagebox.showerror("ไม่มีรายการสินค้า")
+        else:
+            sql = '''UPDATE PurchaseOrderTable
+                    set date = ?, ordererName = ?, supplierName = ?, productList = ?, quantities = ?, costPerUnit = ?, totalCost = ?
+                    WHERE orderID = ?'''
+            date = "%d/%d/%d" %(daySpy.get(), monthSpy.get(), yearSpy.get())
+            ordererName = ordererNameCombo.get()
+            supplierName = supplierCombo.get()
+            productList = ""
+            quantitiesStr = ""
+            costPerUnit = ""
+            for i in range(len(productsName)):
+                if i == len(productsName) - 1:
+                    productList += productsName[i]
+                    quantitiesStr += quantities[i]
+                    costPerUnit += costs[i]
+                else:
+                    productList += productsName[i] + "\n"
+                    quantitiesStr += quantities[i] + "\n"
+                    costPerUnit += costs[i] + "\n"
+            totalCost = getTotal()
+            cursor.execute(sql, [date, ordererName, supplierName, productList, quantitiesStr, costPerUnit, totalCost, oldPurchase[0]])
+            conn.commit()
+            fetchPurchaseTree()
+            messagebox.showinfo("Admin:", "แก้ไขรายการสั่งซื้อดังกล่าวแล้ว")
+            modifyPurchaseWindow.destroy()
+            
+    def updateTotalLabel():
+        totalLabel["text"] = "ค่าใช้จ่าย %.2f บาท"  %getTotal() 
+    def addProductlist():
         def fetchWarehouseTree():
             alreadyAddedId = [int(getProductID(productsName[i])) for i in range(len(productsName))]
             warehouseTree.delete(*warehouseTree.get_children())
@@ -1214,7 +1245,7 @@ def modifyPurchaseClicked():
             res = cursor.fetchall()
             if res:
                 for i in range(len(res)):
-                    if res[i][0] in alreadyAddedId:
+                    if res[i][0] not in alreadyAddedId:
                         warehouseTree.insert("",END, values=(res[i][0],res[i][1], res[i][2], res[i][4]))
         
         
@@ -1226,7 +1257,7 @@ def modifyPurchaseClicked():
 
         def addToProductListClicked():
             if warehouseTree.focus() == "":
-                messagebox.showerror("Admin:", "เลือกสินค้าที่ต้องการแก้ไขลงในรายการสั่งซื้อ")
+                messagebox.showerror("Admin:", "เลือกสินค้าที่ต้องการเพิ่มลงในรายการสั่งซื้อ")
             elif costEnt.get() == "" or costEnt.get().replace('.', '',1).isnumeric() == False:
                 messagebox.showerror("Admin:", "ราคาซื้อต่อหน่วยต้องเป็นจำนวนจริงเท่านั้น")
                 costEnt.focus_force()
@@ -1244,8 +1275,6 @@ def modifyPurchaseClicked():
                 updateTotalLabel()
                 messagebox.showinfo("Admin:", "เพิ่มสินค้าดังกล่าวลงในรายการสั่งซื้อแล้ว")
         
-        def updateTotalLabel():
-            totalLabel["text"] = "ค่าใช้จ่าย %.2f บาท"  %getTotal() 
         
         def confirmClicked():
             addProductlistWindow.destroy()
@@ -1303,9 +1332,77 @@ def modifyPurchaseClicked():
 
         fetchWarehouseTree()
 
-        Button(bot, text="แก้ไขรายการสินค้า", fg="black", bg="yellow", borderless=1, command=addToProductListClicked).grid(row=1, column=0, sticky='e', padx=120)
+        Button(bot, text="เพิ่มรายการสินค้า", fg="black", bg="green", borderless=1, command=addToProductListClicked).grid(row=1, column=0, sticky='e', padx=120)
         
         Button(bot, text="ยืนยัน", fg="black", bg="green", borderless=1, command=confirmClicked).grid(row=1, column=0, sticky='e', padx=20)
+
+
+    def modifyProductlist():
+        if infoTree.focus() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกสินค้าที่ต้องการจะแก้ไข")
+        else:
+            def modifyProductListClicked():
+                if costEnt.get() == "" or costEnt.get().replace('.', '',1).isnumeric() == False:
+                    messagebox.showerror("Admin:", "ราคาซื้อต่อหน่วยต้องเป็นจำนวนจริงเท่านั้น")
+                    costEnt.focus_force()
+                elif orderQuantityEnt.get() == "" or orderQuantityEnt.get().isnumeric() == False:
+                    messagebox.showerror("Admin:", "ปริมาณสั่งซื้อต้องเป็นจำนวนเต็มบวกเท่านั้น")
+                    orderQuantityEnt.focus_force()
+                else:
+                    for i in range(len(productsName)):
+                        if productsName[i] == selectedProd[1]:
+                            costs[i] = costEnt.get()
+                            quantities[i] = orderQuantityEnt.get()
+                    fetchinfoTree()
+                    modifyProductlistWindow.destroy()
+                    updateTotalLabel()
+            
+            
+            def deleteProductListClicked():
+                for i in range(len(productsName)):
+                    if productsName[i] == selectedProd[1]:
+                        costs.pop(productsName.index(productsName[i]))
+                        quantities.pop(productsName.index(productsName[i]))
+                        productsName.remove(productsName[i])
+                        break
+                fetchinfoTree()
+                modifyProductlistWindow.destroy()
+                updateTotalLabel()
+
+
+            w = 600
+            h = 500
+            selectedProd = infoTree.item(infoTree.focus(), "values")
+            selectedcost = selectedProd[2]
+            selectedquan = selectedProd[3]
+            modifyProductlistWindow = Toplevel(root)
+            modifyProductlistWindow.title("แก้ไขรายการสินค้า")
+            modifyProductlistWindow.rowconfigure(0, weight=1)
+            modifyProductlistWindow.columnconfigure(0, weight=1)
+            x = root.winfo_screenwidth() / 2 - w / 2
+            y = root.winfo_screenheight() / 2 - h / 2
+            modifyProductlistWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+            
+            modifyProductListFrame = Frame(modifyProductlistWindow, bg="white")
+            modifyProductListFrame.columnconfigure((0,1), weight=1) # type: ignore
+            modifyProductListFrame.rowconfigure((0,1,2), weight=1) # type: ignore
+            modifyProductListFrame.grid(row=0, column=0, sticky="news")
+
+
+            Label(modifyProductListFrame, text="ราคาซื้อต่อหน่วย:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+            costEnt = Entry(modifyProductListFrame, width=20)
+            costEnt.insert(END, selectedcost)
+            costEnt.grid(row=0, column=1, sticky='w')
+
+            Label(modifyProductListFrame, text="ปริมาณที่สั่งซื้อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+            orderQuantityEnt = Entry(modifyProductListFrame, width=20)
+            orderQuantityEnt.insert(END, selectedquan)
+            orderQuantityEnt.grid(row=1, column=1, sticky='w')
+
+
+            Button(modifyProductListFrame, text="แก้ไขรายการสินค้า", fg="black", bg="green", borderless=1, command=modifyProductListClicked).grid(row=2, columnspan=2, sticky='e', padx=120)
+            
+            Button(modifyProductListFrame, text="ลบสินค้า", fg="black", bg="green", borderless=1, command=deleteProductListClicked).grid(row=2, columnspan=2, sticky='e', padx=20)
 
 
     def fetchinfoTree():
@@ -1391,7 +1488,9 @@ def modifyPurchaseClicked():
         supplierCombo.grid(row=2, column=1, sticky='w')
 
         Label(modifyPurchaseFrame, text="รายการสินค้า:", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
-        Button(modifyPurchaseFrame, text="แก้ไขรายการสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=modifyProductlist).grid(row=3, column=1, sticky='w', padx=5)
+        Button(modifyPurchaseFrame, text="เพิ่มรายการสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=addProductlist).grid(row=3, column=1, sticky='w', padx=5)
+        Button(modifyPurchaseFrame, text="แก้ไขสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=modifyProductlist).grid(row=3, column=1, sticky='e', padx=10)
+
 
         infoTree = ttk.Treeview(modifyPurchaseFrame)
         infoTree.column("#0", width=0, stretch=NO)
@@ -1414,7 +1513,8 @@ def modifyPurchaseClicked():
         totalLabel = Label(modifyPurchaseFrame, text="ค่าใช้จ่าย: " + str(totalCost) + " บาท", fg="red", bg="white", font="verdana 20 bold")
         totalLabel.grid(row=5, columnspan=2)
 
-        # Button(modifyPurchaseFrame, text="แก้ไขรายการสั่งซื้อ", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddPurchaseOrder).grid(row=6, columnspan=2)
+
+        Button(modifyPurchaseFrame, text="แก้ไขรายการสั่งซื้อ", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=ModifyPurchaseOrder).grid(row=6, columnspan=2)
 
 
 
