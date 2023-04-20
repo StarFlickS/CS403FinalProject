@@ -834,6 +834,69 @@ def fetchintelinvestigatesearchtree() :
 def saveintelClicked() :
     resetBtnColor()
     clearInfoFrame()
+
+
+    def getOrderID():
+        list = []
+        sql = "SELECT orderID FROM SellOrderTable WHERE type = 1"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                list.append(res[i][0])
+        return tuple(list)
+
+
+    def saveClicked() :
+        if idCombo.get() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกหมายเลขคำสั่งซื้อ")
+            idCombo.focus_force()
+        elif clientName.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อลูกค้า")
+            clientName.focus_force()
+        elif telNumber.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่เบอร์โทรศัพท์")
+            telNumber.focus_force()
+        elif telNumber.get().replace('-', '').isnumeric() == False or (len(telNumber.get().replace('-', '')) != 10 and len(telNumber.get().replace('-', '')) != 9):
+            messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
+            telNumber.focus_force()
+        elif deliverForm.get() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกวิธีการจัดส่ง")
+        elif transportName.get() == "" and deliverForm.get() == "บริษัทิขนส่ง":
+            messagebox.showerror("Admin:", "กรุณากรอกชื่อบริษัทขนส่ง")
+            transportName.focus_force()
+        elif prodID.get() == "" and deliverForm.get() == "บริษัทิขนส่ง":
+            messagebox.showerror("Admin:", "กรุณากรอกหมายเลขพัสดุ")
+            prodID.focus_force()
+        elif clientAddress.get("1.0", END) == "":
+            messagebox.showerror("Admin:", "กรุณากรอกที่อยู่")
+            clientAddress.focus_force()
+        elif transportName.get() != "" and deliverForm.get() == "ทางร้านจัดส่ง":
+            messagebox.showerror("Admin:", "ทางร้านเป็นผู้จัดส่ง")
+            transportName.delete(0, END)
+        elif prodID.get() != "" and deliverForm.get() == "ทางร้านจัดส่ง":
+            messagebox.showerror("Admin:", "ทางร้านเป็นผู้จัดส่ง")
+            prodID.delete(0, END)
+        else:
+            if deliverForm.get() == "บริษัทิขนส่ง": 
+                sql = "INSERT INTO DeliveryTable (name, phone, type, deliveryName, trackingID, adress) VALUES (?,?,?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 1, transportName.get(), prodID.get(), clientAddress.get("1.0", END)])
+            else:
+                sql = "INSERT INTO DeliveryTable (name, phone, type, adress) VALUES (?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 0, clientAddress.get("1.0", END)])
+            conn.commit()
+            sql = '''SELECT seq FROM sqlite_sequence WHERE name = "DeliveryTable"'''
+            cursor.execute(sql)
+            id = cursor.fetchone()
+            id = id[0]
+
+            sql = "UPDATE SellOrderTable SET deliveryID = ? WHERE orderID = ?"
+            cursor.execute(sql, [id, idCombo.get()])
+            conn.commit()
+            messagebox.showinfo("Admin:", "บันทึกเรียบร้อยแล้ว")
+            clearInfoFrame()
+
+
     saveIntelBtn["fg"] = "blue"
     saveIntelFrame = Frame(infoFrame, bg="cyan")
     saveIntelFrame.columnconfigure((0, 1, 2), weight=1)
@@ -848,9 +911,9 @@ def saveintelClicked() :
     intelFrame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
     intelFrame.grid(row=1, column=0, columnspan=3, sticky="news")
 
-    Label(intelFrame, text="หมายเลขสินค้า", fg="black", bg="white", justify=RIGHT).grid(row=0, column=0, sticky="e")
-    product = Entry(intelFrame, width=70)
-    product.grid(row=0, column=1, columnspan=2, sticky="w")
+    Label(intelFrame, text="หมายเลขคำสั่งซื้อ", fg="black", bg="white", justify=RIGHT).grid(row=0, column=0, sticky="e")
+    idCombo = ttk.Combobox(intelFrame, width=70, values=getOrderID(), state="readonly")
+    idCombo.grid(row=0, column=1, columnspan=2, sticky="w")
 
     Label(intelFrame, text="ชื่อลูกค้า", fg="black", bg="white", justify=RIGHT).grid(row=1, column=0, sticky="e")
     clientName = Entry(intelFrame, width=70)
@@ -861,7 +924,7 @@ def saveintelClicked() :
     telNumber.grid(row=2, column=1, columnspan=2, sticky="w")
 
     Label(intelFrame, text="รูปแบบจัดส่ง", fg="black", bg="white", justify=RIGHT).grid(row=3, column=0, sticky="e")
-    deliverForm = ttk.Combobox(intelFrame, width=35, values=["ส่งเองเก่งพอ", "ขี้เกียจส่งให้หน่อย"])
+    deliverForm = ttk.Combobox(intelFrame, width=35, values=["ทางร้านจัดส่ง", "บริษัทขนส่ง"], state="readonly")
     deliverForm.grid(row=3, column=1, columnspan=2, sticky="w")
     
     Label(intelFrame, text="ชื่อบริษัทขนส่ง", fg="black", bg="white", justify=RIGHT).grid(row=4, column=0, sticky="e")
@@ -875,8 +938,9 @@ def saveintelClicked() :
     Label(intelFrame, text="ที่อยู่จัดส่ง", fg="black", bg="white", justify=RIGHT).grid(row=6, column=0, sticky="e")
     clientAddress = Text(intelFrame, width=70, height=3) # .get ได้เลย
     clientAddress.grid(row=7, column=0, columnspan=3,sticky="n")
+
     # bottom
-    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", width=20, height=5, command=saveClicked)
+    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", font="verdana 25 bold",command=saveClicked, borderless=1)
     saveBtn.grid(row=2, column=2)
 
 
@@ -923,10 +987,6 @@ def reportChange(name, frame) :
         Label(frame, text="รายงานสรุปข้อมูลการขาย", fg="black", bg="white").grid(row=0, column=0, sticky="w")
     elif name == "sum" :
         Label(frame, text="รายงานสรุปรายรับ-รายจ่าย", fg="black", bg="white").grid(row=0, column=0, sticky="w")
-
-
-def saveClicked() :
-    return
 
 
 def printClicked() :
