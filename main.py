@@ -1907,6 +1907,8 @@ ConnectToDatabase()
 usernameSpy = StringVar()
 pwdSpy = StringVar()
 
+print("hello it")
+
 warehouseIsopen = False
 
 LoginPage()
