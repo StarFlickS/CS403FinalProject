@@ -1635,9 +1635,6 @@ def confrimPurchaseClicked():
 
 def sellManagementClicked():
     orderProdlist = []
-    def addOrder():
-        pass
-
     def fetchsellTree():
         sellTree.delete(*sellTree.get_children())
         sql = "SELECT * FROM SellOrderTable"
@@ -1648,14 +1645,61 @@ def sellManagementClicked():
             for i in range(len(res)):
                 if res[i][5] == 1:
                     deType = "จัดส่ง"
-                sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], deType))
+                sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], res[i][5], res[i][6], deType))
 
 
     def addSellClicked():
+        def addOrder():
+            if sellerNameCombo.get() == "":
+                messagebox.showerror("Admin:", "กรุณาเลือกผู้ขายสินค้า")
+            elif infoTree.get_children() == ():
+                messagebox.showerror("Admin:", "ไม่มีรายการขาย")
+            else:
+                sql = '''INSERT INTO SellOrderTable (orderID, date, seller, products, quantities, prices, totalPrice, type)
+                     VALUES (?,?,?,?,?,?,?,?)'''
+                orderID = orderIDSpy.get()
+                today = date.today()
+                d = today.strftime("%d/%m/%y")
+                seller = sellerNameCombo.get()
+                productList = ""
+                quantities = ""
+                pricePerUnit = ""
+                for i in range(len(orderProdlist)):
+                    if i == len(orderProdlist) - 1:
+                        productList += orderProdlist[i][1]
+                        quantities += orderProdlist[i][3]
+                        pricePerUnit += orderProdlist[i][2]
+                    else:
+                        productList += orderProdlist[i][1] + "\n"
+                        quantities += orderProdlist[i][3] + "\n"
+                        pricePerUnit += orderProdlist[i][2] + "\n"
+                totalPrice = getTotalPrice()
+                type = 0
+                if sellTypeSpy.get() == "จัดส่ง":
+                    type = 1
+                cursor.execute(sql, [orderID, d, seller, productList, quantities, pricePerUnit, totalPrice, type])
+                conn.commit()
+                fetchsellTree()
+                messagebox.showinfo("Admin:", "เพิ่มรายการขายดังกล่าวแล้ว")
+                addSellWindow.destroy()
+
+                products = productList.split("\n")
+                quan = quantities.split("\n")
+                price = pricePerUnit.split("\n")
+                for i in range(len(products)):
+                    sql = "SELECT quantity FROM WareHouseTable WHERE productName = ?"
+                    cursor.execute(sql, [products[i]])
+                    originalQuan = cursor.fetchone()
+                    originalQuan = originalQuan[0]
+                    sql = "UPDATE WareHouseTable SET price = ?, quantity = ?, date = ? WHERE productName = ?"
+                    cursor.execute(sql, [pricePerUnit[i], originalQuan - int(quan[i]), d, products[i]])
+                    conn.commit()
+
         def fetchinfoTree():
             infoTree.delete(*infoTree.get_children())
             for i in range(len(orderProdlist)):
                 infoTree.insert("",END, values=(orderProdlist[i][0],orderProdlist[i][1],orderProdlist[i][2],orderProdlist[i][3]))
+
 
         def generateID():
             id = ""
@@ -1818,8 +1862,8 @@ def sellManagementClicked():
         Label(addSellFrame, textvariable=orderIDSpy, fg="black", bg="white", font="verdana 25").grid(row=0, column=1, sticky='w')
 
         Label(addSellFrame, text="ผู้ขาย:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
-        ordererNameCombo = ttk.Combobox(addSellFrame, values=names, state="readonly")
-        ordererNameCombo.grid(row=1, column=1, sticky='w')
+        sellerNameCombo = ttk.Combobox(addSellFrame, values=names, state="readonly")
+        sellerNameCombo.grid(row=1, column=1, sticky='w')
 
         Label(addSellFrame, text="รายการสินค้า:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
         Button(addSellFrame, text="เลือกรายการสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=addProductlist).grid(row=2, column=1, sticky='w', padx=5)
@@ -1837,16 +1881,23 @@ def sellManagementClicked():
         infoTree.heading("ชื่อสินค้า", text="ชื่อสินค้า")
         infoTree.heading("ราคาขายต่อหน่วย", text="ราคาขายต่อหน่วย")
         infoTree.heading("ปริมาณที่ขาย", text="ปริมาณที่ขาย")
-        infoTree.grid(row=5, columnspan=2)
+        infoTree.grid(row=3, columnspan=2)
 
         fetchinfoTree()
         totalPrice = getTotalPrice()
 
-        totalLabel = Label(addSellFrame, text="ราคารวม: " + str(totalPrice) + " บาท", fg="red", bg="white", font="verdana 20 bold")
-        totalLabel.grid(row=6, columnspan=2)
+        sellTypeSpy = StringVar()
+        sellType = ["หน้าร้าน", "จัดส่ง"]
+        sellTypeSpy.set(sellType[0])
+
+        Label(addSellFrame, text="ประเภทการจัดส่ง:", fg="black", bg="white", font="verdana 25").grid(row=4, column=0, sticky='e')
+        OptionMenu(addSellFrame, sellTypeSpy, *sellType, ).grid(row=4, column=1, sticky='w')
+
+        totalLabel = Label(addSellFrame, text="ราคารวม: " + str(totalPrice) + " บาท", fg="green", bg="white", font="verdana 20 bold")
+        totalLabel.grid(row=5, columnspan=2)
 
 
-        Button(addSellFrame, text="เพิ่มรายการสั่งซื้อ", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=addOrder).grid(row=7, columnspan=2)
+        Button(addSellFrame, text="เพิ่มรายการขาย", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=addOrder).grid(row=6, columnspan=2)
 
 
     resetBtnColor()
@@ -1878,20 +1929,24 @@ def sellManagementClicked():
 
     sellTree = ttk.Treeview(middle)
     sellTree.column("#0", width=0, stretch=NO)
-    sellTree["columns"] = ("หมายเลขการสั่งซื้อ","วันที่ขาย", "ชื่อผู้ขาย", "รายการสินค้า", 'ปริมาณที่ขาย', "ประเภทจัดส่ง")
+    sellTree["columns"] = ("หมายเลขการสั่งซื้อ","วันที่ขาย", "ชื่อผู้ขาย", "รายการสินค้า", 'ปริมาณที่ขาย', "ราคาขายต่อหน่วย", "ราคารวม", "ประเภทจัดส่ง")
 
     sellTree.column("หมายเลขการสั่งซื้อ", width=100, anchor=CENTER)
     sellTree.column("วันที่ขาย", width=100, anchor=CENTER)
     sellTree.column("ชื่อผู้ขาย", width=120, anchor=CENTER)
-    sellTree.column("รายการสินค้า", width=120, anchor=CENTER)
+    sellTree.column("รายการสินค้า", width=90, anchor=CENTER)
     sellTree.column("ปริมาณที่ขาย", width=120, anchor=CENTER)
-    sellTree.column("ประเภทจัดส่ง", width=120, anchor=CENTER)
+    sellTree.column("ราคาขายต่อหน่วย", width=120, anchor=CENTER)
+    sellTree.column("ราคารวม", width=90, anchor=CENTER)
+    sellTree.column("ประเภทจัดส่ง", width=90, anchor=CENTER)
 
     sellTree.heading("หมายเลขการสั่งซื้อ", text="หมายเลขการสั่งซื้อ")
     sellTree.heading("วันที่ขาย", text="วันที่ขาย")
     sellTree.heading("ชื่อผู้ขาย", text="ชื่อผู้ขาย")
     sellTree.heading("รายการสินค้า", text="รายการสินค้า")
     sellTree.heading("ปริมาณที่ขาย", text="ปริมาณที่ขาย")
+    sellTree.heading("ราคาขายต่อหน่วย", text="ราคาขายต่อหน่วย")
+    sellTree.heading("ราคารวม", text="ราคารวม")
     sellTree.heading("ประเภทจัดส่ง", text="ประเภทจัดส่ง")
     sellTree.grid(row=0, column=0)
 
