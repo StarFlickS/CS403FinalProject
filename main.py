@@ -809,14 +809,10 @@ def fetchintelinvestigatesearchtree() :
                 if intelSearchBar.get() in res[i][3] :
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
             elif searchTypeSpy.get() == "สินค้า" and dateSelectSpy.get() == "เลือกเอง" :
-                print("hi")
                 if intelSearchBar.get() in res[i][4] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
-                    print("hello")
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
             elif searchTypeSpy.get() == "ผู้ค้าส่ง" and dateSelectSpy.get() == "เลือกเอง" :
-                print("hello")
                 if intelSearchBar.get() in res[i][3] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
-                    print("hi")
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
 
 
@@ -825,13 +821,13 @@ def saveintelClicked() :
     resetBtnColor()
     clearInfoFrame()
     saveIntelBtn["fg"] = "blue"
-    saveIntelFrame = Frame(infoFrame, bg="cyan")
+    saveIntelFrame = Frame(infoFrame, bg="white")
     saveIntelFrame.columnconfigure((0, 1, 2), weight=1)
     saveIntelFrame.rowconfigure((0, 2), weight=1)
     saveIntelFrame.rowconfigure(1, weight=8)
     saveIntelFrame.grid(row=0, column=0, sticky="news")
     # header
-    Label(saveIntelFrame, text="บันทึกข้อมูลการจัดส่ง", fg="black", bg="cyan", font="verdana 25").grid(row=0, column=0)
+    Label(saveIntelFrame, text="บันทึกข้อมูลการจัดส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, columnspan=3)
     #middle
     intelFrame = Frame(saveIntelFrame, bg="white")
     intelFrame.columnconfigure((0, 1, 2), weight=1)
@@ -866,7 +862,7 @@ def saveintelClicked() :
     clientAddress = Text(intelFrame, width=70, height=3) # .get ได้เลย
     clientAddress.grid(row=7, column=0, columnspan=3,sticky="n")
     # bottom
-    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", width=20, height=5, command=saveClicked)
+    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", font="verdana 20", command=saveClicked)
     saveBtn.grid(row=2, column=2)
 
 
@@ -874,7 +870,7 @@ def printreportClicked() :
     resetBtnColor()
     clearInfoFrame()
     printReportBtn["fg"] = "blue"
-    printReportFrame = Frame(infoFrame, bg="lime")
+    printReportFrame = Frame(infoFrame, bg="white")
     printReportFrame.rowconfigure((0, 2), weight=1)
     printReportFrame.rowconfigure(1, weight=3)
     printReportFrame.columnconfigure((0, 1), weight=1)
@@ -885,20 +881,23 @@ def printreportClicked() :
     headFrame.columnconfigure((0, 1), weight=1)
     headFrame.grid(row=0, column=0, columnspan=2, sticky="news")
     # middle
-    middleFrame = Frame(printReportFrame, bg="orange")
+    middleFrame = Frame(printReportFrame, bg="white")
     middleFrame.rowconfigure(0, weight=1)
     middleFrame.rowconfigure(1, weight=3)
     middleFrame.columnconfigure(0, weight=1)
     middleFrame.grid(row=1, column=0, columnspan=2, sticky="news")
     # bottom
-    printBtn = Button(printReportFrame, text="พิมพ์", fg="black", bg="yellow", command=printClicked, width=20, height=5)
+    printBtn = Button(printReportFrame, text="พิมพ์", fg="black", bg="yellow", font="verdana 20", command=printClicked)
     printBtn.grid(row=2, column=1, sticky="e", padx=10)
     # head buttons
-    purchaseReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการสั่งซื้อ", fg="black", bg="white", command=lambda:reportChange("purchase", middleFrame))
+    purchaseReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการสั่งซื้อ", font="verdana 20", fg="black", bg="white",
+                               command=lambda: reportChange("purchase", middleFrame))
     purchaseReportBtn.grid(row=0, column=0, sticky="news", padx=10)
-    sellingReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการขาย", fg="black", bg="white", command=lambda:reportChange("selling", middleFrame))
+    sellingReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการขาย", font="verdana 20", fg="black", bg="white",
+                              command=lambda: reportChange("selling", middleFrame))
     sellingReportBtn.grid(row=0, column=1, sticky="news", padx=10)
-    sumReportBtn = Button(headFrame, text="รายงานสรุปรายรับ-รายจ่าย", fg="black", bg="white", command=lambda:reportChange("sum", middleFrame))
+    sumReportBtn = Button(headFrame, text="รายงานสรุปรายรับ-รายจ่าย", font="verdana 20", fg="black", bg="white",
+                          command=lambda: reportChange("sum", middleFrame))
     sumReportBtn.grid(row=1, column=0, columnspan=2, sticky="news", pady=3, padx=40)
 
 
@@ -1907,7 +1906,6 @@ ConnectToDatabase()
 usernameSpy = StringVar()
 pwdSpy = StringVar()
 
-print("hello it")
 
 warehouseIsopen = False
 
