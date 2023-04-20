@@ -134,7 +134,7 @@ def MainPage():
     printReportBtn.grid(row=7, column=0, columnspan=2, sticky="news")
     
     # จัดการบัญชี
-    accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=printreportClicked,borderless=1)
+    accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=accountManagementClicked,borderless=1)
     accountManagementBtn.grid(row=8, column=0, columnspan=2, sticky="news")
 
     # Logout Button
@@ -642,9 +642,9 @@ def modifySupperlierClicked():
 
 def deleteSupplierClicked():
     if supplierTree.focus() == "":
-        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะลบที่ต้องการจะลบ")
+        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะลบ")
     else:
-        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค้าส่งนี้หรือไม่นี้หรือไม่", icon="warning")
+        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค้าส่งนี้หรือไม่", icon="warning")
         if msg == "yes":
             selectedSupp = supplierTree.item(supplierTree.focus(), "values")
             selectedSupp_id= selectedSupp[0]
@@ -1643,7 +1643,7 @@ def sellManagementClicked():
         if res:
             deType = "หน้าร้าน"
             for i in range(len(res)):
-                if res[i][5] == 1:
+                if res[i][7] == 1:
                     deType = "จัดส่ง"
                 sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], res[i][5], res[i][6], deType))
 
@@ -1952,6 +1952,254 @@ def sellManagementClicked():
 
     fetchsellTree()
 
+
+def accountManagementClicked():
+    def addAccountClicked():
+        def AddAccout():
+            if fullnameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ชื่อ")
+                fullnameEnt.focus_force()
+            elif fullnameEnt.get().isnumeric() == True:
+                messagebox.showerror("Admin:", "ชื่อไม่สามารถเป็นตัวเลขได้")
+                fullnameEnt.focus_force()
+            elif usernameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ Username")
+                usernameEnt.focus_force()
+            elif pwdEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณากรอกรหัสผ่าน")
+                pwdEnt.focus_force()
+            else:
+                isValid = True
+                sql = "SELECT name FROM LoginTable"
+                cursor.execute(sql)
+                res = cursor.fetchall()
+                for i in range(len(res)):
+                    if res[i][0] == fullnameEnt.get():
+                        messagebox.showerror("Admin:","มีบัญชีผู้ใช้รายนี้ในฐานข้อมูลแล้ว")
+                        isValid = False
+                        break
+                
+                if isValid:
+                    sql = "INSERT INTO LoginTable (username, pwd, name, permission) VALUES (?,?,?,?)"
+                    per = 0
+                    if perSpy.get() == "บ้างส่วน":
+                        per = 1
+                    cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per])
+                    conn.commit()
+                    messagebox.showinfo("Admin:", "บัญชีผู้ใช้ใหม่ได้ถูกเพิ่มเข้าสู่ฐานระบบแล้ว")
+                    addAccoutWindow.destroy()
+                    fetchaccoutTree()
+                else:
+                    fullnameEnt.focus_force()
+
+        w = 500
+        h = 500
+        addAccoutWindow = Toplevel(root)
+        addAccoutWindow.title("เพิ่มบัญชีใหม่")
+        addAccoutWindow.rowconfigure(0, weight=1)
+        addAccoutWindow.columnconfigure(0, weight=1)
+        x = root.winfo_screenwidth() / 2 - w / 2
+        y = root.winfo_screenheight() / 2 - h / 2
+        addAccoutWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+        addAccoutFrame = Frame(addAccoutWindow, bg="white")
+        addAccoutFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
+        addAccoutFrame.columnconfigure((0,1), weight=1)  # type: ignore
+        addAccoutFrame.grid(row=0, column=0, sticky="news")
+
+        Label(addAccoutFrame, text="ชื่อ:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+        fullnameEnt = Entry(addAccoutFrame, width=20)
+        fullnameEnt.grid(row=0, column=1, sticky='w')
+
+        Label(addAccoutFrame, text="Username:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+        usernameEnt = Entry(addAccoutFrame, width=20)
+        usernameEnt.grid(row=1, column=1, sticky='w')
+
+        Label(addAccoutFrame, text="รหัสผ่าน", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+        pwdEnt = Entry(addAccoutFrame, width=20, show="●")
+        pwdEnt.grid(row=2, column=1, sticky='w')
+        
+        perSpy = StringVar()
+        perList = ["ทั้งหมด", "บ้างส่วน"]
+        perSpy.set(perList[1])
+        Label(addAccoutFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+        OptionMenu(addAccoutFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
+
+        Button(addAccoutFrame, text="เพิ่มบัญชีผู้ใช้", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddAccout).grid(row=4, columnspan=2)
+
+    def modifyAccoutClicked():
+        def ModifyAccout():
+            if fullnameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ชื่อ")
+                fullnameEnt.focus_force()
+            elif fullnameEnt.get().isnumeric() == True:
+                messagebox.showerror("Admin:", "ชื่อไม่สามารถเป็นตัวเลขได้")
+                fullnameEnt.focus_force()
+            elif usernameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ Username")
+                usernameEnt.focus_force()
+            elif pwdEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณากรอกรหัสผ่าน")
+                pwdEnt.focus_force()
+            else:
+                isValid = True
+                sql = "SELECT userID, name FROM LoginTable"
+                cursor.execute(sql)
+                res = cursor.fetchall()
+                for i in range(len(res)):
+                    if res[i][0] == fullnameEnt.get() and res[i][1] != selectedAcc_id:
+                        messagebox.showerror("Admin:","มีบัญชีผู้ใช้รายนี้ในฐานข้อมูลแล้ว")
+                        isValid = False
+                        break
+        
+                if isValid:
+                    per = 0
+                    if perSpy.get() == "บ้างส่วน":
+                        per = 1
+                    sql = "UPDATE LoginTable SET username = ?, pwd = ?, name = ?, permission = ? WHERE userID = ?"
+                    cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per, selectedAcc_id])
+                    conn.commit()
+                    messagebox.showinfo("Admin:", "แก้ไขบัญชีผู้ใช้เรียบร้อยแล้ว")
+                    modifyWindow.destroy()
+                    fetchaccoutTree()
+                else:
+                    fullnameEnt.focus_force()
+
+        if accountTree.focus() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกบัญชีที่ต้องการจะแก้ไข")
+        else:
+            def getPwd():
+                sql = "SELECT pwd FROM LoginTable WHERE userID = ?"
+                cursor.execute(sql, [selectedAcc_id])
+                res = cursor.fetchone()
+                return res[0]
+            
+            selectedAcc = accountTree.item(accountTree.focus(), "values")
+            selectedAcc_id = int(selectedAcc[0])
+            selectedAcc_username = selectedAcc[1]
+            selectedAcc_pwd = getPwd()
+            selectedAcc_name = selectedAcc[2]
+            selectedAcc_per = selectedAcc[3]
+
+            w = 500
+            h = 500
+            modifyWindow = Toplevel(root)
+            modifyWindow.title("แก้ไขบัญชี")
+            modifyWindow.rowconfigure(0, weight=1)
+            modifyWindow.columnconfigure(0, weight=1)
+            x = root.winfo_screenwidth() / 2 - w / 2
+            y = root.winfo_screenheight() / 2 - h / 2
+            modifyWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+            modifyFrame = Frame(modifyWindow, bg="white")
+            modifyFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
+            modifyFrame.columnconfigure((0,1), weight=1)  # type: ignore
+            modifyFrame.grid(row=0, column=0, sticky="news")
+
+            Label(modifyFrame, text="ชื่อ:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+            fullnameEnt = Entry(modifyFrame, width=20)
+            fullnameEnt.insert(END, selectedAcc_name)
+            fullnameEnt.grid(row=0, column=1, sticky='w')
+
+            Label(modifyFrame, text="Username:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+            usernameEnt = Entry(modifyFrame, width=20)
+            usernameEnt.insert(END, selectedAcc_username)
+            usernameEnt.grid(row=1, column=1, sticky='w')
+
+            Label(modifyFrame, text="รหัสผ่าน", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+            pwdEnt = Entry(modifyFrame, width=20, show="●")
+            pwdEnt.insert(END, selectedAcc_pwd)
+            pwdEnt.grid(row=2, column=1, sticky='w')
+            
+            perSpy = StringVar()
+            perList = ["ทั้งหมด", "บ้างส่วน"]
+            perSpy.set(selectedAcc_per)
+            Label(modifyFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+            OptionMenu(modifyFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
+
+            Button(modifyFrame, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyAccout).grid(row=4, columnspan=2)
+
+
+    def deleteAccoutClicked():
+        if accountTree.focus() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกบัญชีที่ต้องการจะลบ")
+        else:
+            msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ใช้นี้หรือไม่", icon="warning")
+            if msg == "yes":
+                selectedAcc = accountTree.item(accountTree.focus(), "values")
+                selectedAcc_id= selectedAcc[0]
+                sql = '''DELETE FROM LoginTable
+                            WHERE userID = ?'''
+                cursor.execute(sql, [selectedAcc_id])
+                conn.commit()
+                messagebox.showinfo("Admin:", "ผู้ใช้ถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว")
+                fetchaccoutTree()
+
+
+    def fetchaccoutTree():
+        accountTree.delete(*accountTree.get_children())
+        sql = "SELECT * FROM LoginTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                per = "บ้างส่วน"
+                if res[i][4] == 0:
+                    per = "ทั้งหมด"
+                accountTree.insert("",END, values=(res[i][0],res[i][1], res[i][3], per))
+
+    clearInfoFrame()
+    resetBtnColor()
+
+    accountManagementBtn["fg"] = "blue"
+    accountManageFrame = Frame(infoFrame, bg="white")
+    accountManageFrame.rowconfigure(0, weight=1) # type: ignore
+    accountManageFrame.rowconfigure(1, weight=5)
+    accountManageFrame.columnconfigure(0, weight=1)
+    accountManageFrame.grid(row=0, column=0, sticky="news")
+
+    top = Frame(accountManageFrame, bg="white")
+    top.rowconfigure(0, weight=1)
+    top.columnconfigure(0, weight=1)
+    top.grid(row=0, column=0, sticky="news")
+
+    middle = Frame(accountManageFrame, bg="white")
+    middle.rowconfigure(0, weight=1) #type: ignore
+
+    middle.columnconfigure(0, weight=1)
+    middle.grid(row=1, column=0, sticky="news")
+
+    #header
+    Label(top, text="จัดการบัญชีผู้ใช้", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+
+    accountTree = ttk.Treeview(middle)
+    accountTree.column("#0", width=0, stretch=NO)
+    accountTree["columns"] = ("หมายเลขผู้ใช้งาน","Username", "ชื่อ", "สิทธิ์การเข้าถึง")
+
+    accountTree.column("หมายเลขผู้ใช้งาน", width=100, anchor=CENTER)
+    accountTree.column("Username", width=100, anchor=CENTER)
+    accountTree.column("ชื่อ", width=120, anchor=CENTER)
+    accountTree.column("สิทธิ์การเข้าถึง", width=120, anchor=CENTER)
+
+    accountTree.heading("หมายเลขผู้ใช้งาน", text="หมายเลขผู้ใช้งาน")
+    accountTree.heading("Username", text="Username")
+    accountTree.heading("ชื่อ", text="ชื่อ")
+    accountTree.heading("สิทธิ์การเข้าถึง", text="สิทธิ์การเข้าถึง")
+
+    accountTree.grid(row=0, column=0)
+
+    # Add Button
+    Button(middle, text="เพิ่มบัญชี", fg="black", bg="green", borderless=1, command=addAccountClicked).grid(row=0, column=0, sticky='ne', padx=180, pady=170)
+
+    # Modify Button
+    Button(middle, text="แก้ไขบัญชี", fg="black", bg="yellow", borderless=1, command=modifyAccoutClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
+
+    #Delete Button
+    Button(middle, text="ลบบัญชี", fg="black", bg="red", borderless=1, command=deleteAccoutClicked).grid(row=0, column=0, sticky='se', padx=180, pady=170)
+    
+    fetchaccoutTree()
+
+
 w = 1024
 h = 720
 
@@ -1961,8 +2209,6 @@ ConnectToDatabase()
 # Login Spies
 usernameSpy = StringVar()
 pwdSpy = StringVar()
-
-warehouseIsopen = False
 
 LoginPage()
 root.mainloop()
