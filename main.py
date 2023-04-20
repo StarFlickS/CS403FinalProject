@@ -656,31 +656,35 @@ def deleteSupplierClicked():
             fetchSupplierTree()
 
 
-def productsearchClicked() :
+def productsearchClicked():
     global prodSearchFrame, searchBar
     resetBtnColor()
     clearInfoFrame()
     productSearchBtn["fg"] = "blue"
-    prodSearchFrame = Frame(infoFrame, bg="yellow")
+    prodSearchFrame = Frame(infoFrame, bg="white")
     prodSearchFrame.rowconfigure(0, weight=1)
     prodSearchFrame.rowconfigure(1, weight=3)
     prodSearchFrame.columnconfigure(0, weight=3)
     prodSearchFrame.columnconfigure(1, weight=1)
     prodSearchFrame.grid(row=0, column=0, sticky="news")
     # head
+    Label(prodSearchFrame, text="ค้นหาสินค้า", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0,
+                                                                                                    columnspan=2,
+                                                                                                    sticky="n")
     searchBar = Entry(prodSearchFrame, width=70)
     searchBar.grid(row=0, column=0)
     searchBtn = Button(prodSearchFrame, text="ค้นหา", command=createProdSearchTree)
     searchBtn.grid(row=0, column=1)
 
 
-def createProdSearchTree() :
+def createProdSearchTree():
     global prodserachedTree
+
     prodserachedTree = ttk.Treeview(prodSearchFrame)
     prodserachedTree.column("#0", width=0, stretch=NO)
     prodserachedTree["columns"] = ("ชื่อสินค้า", "จำนวน", "ราคา/หน่วย", "วันที่สั่ง")
 
-    prodserachedTree.column("ชื่อสินค้า", width=120, anchor=E)
+    prodserachedTree.column("ชื่อสินค้า", width=120, anchor=CENTER)
     prodserachedTree.column("จำนวน", width=120, anchor=CENTER)
     prodserachedTree.column("ราคา/หน่วย", width=120, anchor=CENTER)
     prodserachedTree.column("วันที่สั่ง", width=120, anchor=CENTER)
@@ -690,8 +694,9 @@ def createProdSearchTree() :
     prodserachedTree.heading("ราคา/หน่วย", text="ราคา/หน่วย")
     prodserachedTree.heading("วันที่สั่ง", text="วันที่สั่ง")
 
-    prodserachedTree.grid(row=1, column=0, columnspan=2)
-    fetchProdSearchedTree()
+    if searchBar.get().replace(" ", "") != "":
+        prodserachedTree.grid(row=1, column=0, columnspan=2)
+        fetchProdSearchedTree()
 
 
 def fetchProdSearchedTree():
@@ -700,27 +705,82 @@ def fetchProdSearchedTree():
     cursor.execute(sql)
     res = cursor.fetchall()
     if res:
-        for i in range(len(res)):
-            if searchBar.get() in res[i][1] :
-                prodserachedTree.insert("",END, values=(res[i][1],res[i][4], res[i][3], res[i][5]))
+        if searchBar.get().replace(" ", "") == "":
+            pass
+        else:
+            for i in range(len(res)):
+                if searchBar.get() in res[i][1]:
+                    prodserachedTree.insert("", END, values=(res[i][1], res[i][4], res[i][3], res[i][5]))
 
 
-def intelinvestigateClicked() :
+def intelinvestigateClicked():
+    global dateSelectSpy,intelInvestigateTree, searchTypeSpy, intelSearchBar, dayIntelSpy, monthIntelSpy, yearIntelSpy
     resetBtnColor()
     clearInfoFrame()
     intelInvestigateBtn["fg"] = "blue"
-    intelinvestigateFrame = Frame(infoFrame, bg="gray")
-    intelinvestigateFrame.rowconfigure((0, 1), weight=1)
-    intelinvestigateFrame.columnconfigure((0, 1), weight=1)
+    intelinvestigateFrame = Frame(infoFrame, bg="white")
+    intelinvestigateFrame.rowconfigure((0, 1, 2), weight=1)
+    intelinvestigateFrame.columnconfigure(0, weight=2)
+    intelinvestigateFrame.columnconfigure((1, 2), weight=1)
     intelinvestigateFrame.grid(row=0, column=0, sticky="news")
-    # head 
-    Label(intelinvestigateFrame, text="ตรวจสอบข้อมูลการสั่งสินค้า", fg="black", bg="white").grid(row=0, column=0)
+    # head
+    Label(intelinvestigateFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="black", bg="white", font="verdana 35 bold").grid(
+        row=0, column=0, columnspan=3)
     # middle
+    intelSearchBar = Entry(intelinvestigateFrame, width=70)
+    intelSearchBar.grid(row=1, column=0,sticky="n")
+
+    searchType = ["สินค้า", "ผู้ค้าส่ง"]
+
+    searchTypeSpy = StringVar()
+    searchTypeSpy.set(searchType[0])
+
+    OptionMenu(intelinvestigateFrame, searchTypeSpy, *searchType).grid(row=1, column=1,sticky="n")  # type: ignore
+
+    intelSearchBtn = Button(intelinvestigateFrame, text="ค้นหา", fg="black", bg="lime", font="verdana 16",
+                            command=fetchintelinvestigatesearchtree)
+    intelSearchBtn.grid(row=1, column=2, sticky="n")
+
+    dateSelect = ["เวลาใดก็ได้", "เลือกเอง"]
+
+    dateSelectSpy = StringVar()
+    dateSelectSpy.set(dateSelect[0])
+
+    days = [x for x in range(1, 32)]
+    months = [x for x in range(1, 13)]
+    years = [x for x in range(2023, 2033)]
+
+    dayIntelSpy = IntVar()
+    dayIntelSpy.set(days[0])
+
+    monthIntelSpy = IntVar()
+    monthIntelSpy.set(months[0])
+
+    yearIntelSpy = IntVar()
+    yearIntelSpy.set(years[0])
+
+    OptionMenu(intelinvestigateFrame, dateSelectSpy, *dateSelect, command=lambda c:dateselectswitch(c)).grid(row=1, column=1,sticky="")
+
+    def dateselectswitch(option):
+        global day, month, year
+        if option == "เลือกเอง" :
+            day = OptionMenu(intelinvestigateFrame, dayIntelSpy, *days)
+            month = OptionMenu(intelinvestigateFrame, monthIntelSpy, *months)
+            year = OptionMenu(intelinvestigateFrame, yearIntelSpy, *years)
+            day.grid(row=1, column=0, sticky="w", padx=50)  # type: ignore
+            month.grid(row=1, column=0)  # type: ignore
+            year.grid(row=1, column=0, sticky="e", padx=50)  # type: ignore
+        else:
+            day.destroy()
+            month.destroy()
+            year.destroy()
+
+    # bottom
     intelInvestigateTree = ttk.Treeview(intelinvestigateFrame)
     intelInvestigateTree.column("#0", width=0, stretch=NO)
     intelInvestigateTree["columns"] = ("ชื่อสินค้า", "จำนวน", "ราคา/หน่วย", "วันที่สั่ง", "ผู้ค้าส่ง")
 
-    intelInvestigateTree.column("ชื่อสินค้า", width=120, anchor=E)
+    intelInvestigateTree.column("ชื่อสินค้า", width=120, anchor=CENTER)
     intelInvestigateTree.column("จำนวน", width=120, anchor=CENTER)
     intelInvestigateTree.column("ราคา/หน่วย", width=120, anchor=CENTER)
     intelInvestigateTree.column("วันที่สั่ง", width=120, anchor=CENTER)
@@ -732,15 +792,33 @@ def intelinvestigateClicked() :
     intelInvestigateTree.heading("วันที่สั่ง", text="วันที่สั่ง")
     intelInvestigateTree.heading("ผู้ค้าส่ง", text="ผู้ค้าส่ง")
 
-    intelInvestigateTree.grid(row=1, column=0, columnspan=2)
+    intelInvestigateTree.grid(row=2, column=0, columnspan=3, sticky="n")
 
+
+def fetchintelinvestigatesearchtree() :
     intelInvestigateTree.delete(*intelInvestigateTree.get_children())
-    sql = "SELECT * FROM TableName"
+    sql = "SELECT * FROM PurchaseOrderTable"
     cursor.execute(sql)
     res = cursor.fetchall()
     if res:
         for i in range(len(res)):
-            prodserachedTree.insert("",END, values=(res[i][1],res[i][4], res[i][3], res[i][5]))
+            if searchTypeSpy.get() == "สินค้า" and dateSelectSpy.get() == "เวลาใดก็ได้":
+                if intelSearchBar.get() in res[i][4] :
+                    intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
+            elif searchTypeSpy.get() == "ผู้ค้าส่ง" and dateSelectSpy.get() == "เวลาใดก็ได้" :
+                if intelSearchBar.get() in res[i][3] :
+                    intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
+            elif searchTypeSpy.get() == "สินค้า" and dateSelectSpy.get() == "เลือกเอง" :
+                print("hi")
+                if intelSearchBar.get() in res[i][4] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
+                    print("hello")
+                    intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
+            elif searchTypeSpy.get() == "ผู้ค้าส่ง" and dateSelectSpy.get() == "เลือกเอง" :
+                print("hello")
+                if intelSearchBar.get() in res[i][3] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
+                    print("hi")
+                    intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
+
 
 
 def saveintelClicked() :
@@ -1818,8 +1896,6 @@ def sellManagementClicked():
     sellTree.grid(row=0, column=0)
 
     fetchsellTree()
-
-
 
 w = 1024
 h = 720
