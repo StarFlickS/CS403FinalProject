@@ -57,7 +57,7 @@ def LoginPage():
     bot.columnconfigure(0, weight=1)
     bot.grid(row=2, column=0, sticky="news")
 
-    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=MainPage)
+    loginBtn = Button(bot, text="เข้าสู่ระบบ", fg="white", bg="gray", borderless=1, command=loginclicked)
     loginBtn.grid(row=0, column=0)
 
 
@@ -134,7 +134,7 @@ def MainPage():
     printReportBtn.grid(row=7, column=0, columnspan=2, sticky="news")
     
     # จัดการบัญชี
-    accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=printreportClicked,borderless=1)
+    accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=accountManagementClicked,borderless=1)
     accountManagementBtn.grid(row=8, column=0, columnspan=2, sticky="news")
 
     # Logout Button
@@ -224,6 +224,8 @@ def fetchWarehouseTree():
 
 
 def addProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     def AddProduct():
         if prodnameSpy.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ชื่อสินค้า")
@@ -309,6 +311,8 @@ def addProductClicked():
 
 
 def deleteProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     if warehouseTree.focus() == "":
         messagebox.showerror("Admin:", "กรุณาเลือกสินค้าที่ต้องการจะลบ")
     else:
@@ -325,6 +329,8 @@ def deleteProductClicked():
 
 
 def modifyProductClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     def ModifyProduct():
         if prodnameSpy.get() == "":
             messagebox.showerror("Admin:", "กรุณาใส่ชื่อสินค้า")
@@ -423,6 +429,8 @@ def modifyProductClicked():
 
 
 def supplierManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global supplierTree
     resetBtnColor()
     clearInfoFrame()
@@ -642,9 +650,9 @@ def modifySupperlierClicked():
 
 def deleteSupplierClicked():
     if supplierTree.focus() == "":
-        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะลบที่ต้องการจะลบ")
+        messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่งที่ต้องการจะลบ")
     else:
-        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค้าส่งนี้หรือไม่นี้หรือไม่", icon="warning")
+        msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ค้าส่งนี้หรือไม่", icon="warning")
         if msg == "yes":
             selectedSupp = supplierTree.item(supplierTree.focus(), "values")
             selectedSupp_id= selectedSupp[0]
@@ -714,6 +722,8 @@ def fetchProdSearchedTree():
 
 
 def intelinvestigateClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global dateSelectSpy,intelInvestigateTree, searchTypeSpy, intelSearchBar, dayIntelSpy, monthIntelSpy, yearIntelSpy
     resetBtnColor()
     clearInfoFrame()
@@ -820,6 +830,69 @@ def fetchintelinvestigatesearchtree() :
 def saveintelClicked() :
     resetBtnColor()
     clearInfoFrame()
+
+
+    def getOrderID():
+        list = []
+        sql = "SELECT orderID FROM SellOrderTable WHERE type = 1"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                list.append(res[i][0])
+        return tuple(list)
+
+
+    def saveClicked() :
+        if idCombo.get() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกหมายเลขคำสั่งซื้อ")
+            idCombo.focus_force()
+        elif clientName.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่ชื่อลูกค้า")
+            clientName.focus_force()
+        elif telNumber.get() == "":
+            messagebox.showerror("Admin:", "กรุณาใส่เบอร์โทรศัพท์")
+            telNumber.focus_force()
+        elif telNumber.get().replace('-', '').isnumeric() == False or (len(telNumber.get().replace('-', '')) != 10 and len(telNumber.get().replace('-', '')) != 9):
+            messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
+            telNumber.focus_force()
+        elif deliverForm.get() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกวิธีการจัดส่ง")
+        elif transportName.get() == "" and deliverForm.get() == "บริษัทิขนส่ง":
+            messagebox.showerror("Admin:", "กรุณากรอกชื่อบริษัทขนส่ง")
+            transportName.focus_force()
+        elif prodID.get() == "" and deliverForm.get() == "บริษัทิขนส่ง":
+            messagebox.showerror("Admin:", "กรุณากรอกหมายเลขพัสดุ")
+            prodID.focus_force()
+        elif clientAddress.get("1.0", END) == "":
+            messagebox.showerror("Admin:", "กรุณากรอกที่อยู่")
+            clientAddress.focus_force()
+        elif transportName.get() != "" and deliverForm.get() == "ทางร้านจัดส่ง":
+            messagebox.showerror("Admin:", "ทางร้านเป็นผู้จัดส่ง")
+            transportName.delete(0, END)
+        elif prodID.get() != "" and deliverForm.get() == "ทางร้านจัดส่ง":
+            messagebox.showerror("Admin:", "ทางร้านเป็นผู้จัดส่ง")
+            prodID.delete(0, END)
+        else:
+            if deliverForm.get() == "บริษัทิขนส่ง": 
+                sql = "INSERT INTO DeliveryTable (name, phone, type, deliveryName, trackingID, adress) VALUES (?,?,?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 1, transportName.get(), prodID.get(), clientAddress.get("1.0", END)])
+            else:
+                sql = "INSERT INTO DeliveryTable (name, phone, type, adress) VALUES (?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 0, clientAddress.get("1.0", END)])
+            conn.commit()
+            sql = '''SELECT seq FROM sqlite_sequence WHERE name = "DeliveryTable"'''
+            cursor.execute(sql)
+            id = cursor.fetchone()
+            id = id[0]
+
+            sql = "UPDATE SellOrderTable SET deliveryID = ? WHERE orderID = ?"
+            cursor.execute(sql, [id, idCombo.get()])
+            conn.commit()
+            messagebox.showinfo("Admin:", "บันทึกเรียบร้อยแล้ว")
+            clearInfoFrame()
+
+
     saveIntelBtn["fg"] = "blue"
     saveIntelFrame = Frame(infoFrame, bg="white")
     saveIntelFrame.columnconfigure((0, 1, 2), weight=1)
@@ -834,9 +907,9 @@ def saveintelClicked() :
     intelFrame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
     intelFrame.grid(row=1, column=0, columnspan=3, sticky="news")
 
-    Label(intelFrame, text="หมายเลขสินค้า", fg="black", bg="white", justify=RIGHT).grid(row=0, column=0, sticky="e")
-    product = Entry(intelFrame, width=70)
-    product.grid(row=0, column=1, columnspan=2, sticky="w")
+    Label(intelFrame, text="หมายเลขคำสั่งซื้อ", fg="black", bg="white", justify=RIGHT).grid(row=0, column=0, sticky="e")
+    idCombo = ttk.Combobox(intelFrame, width=70, values=getOrderID(), state="readonly")
+    idCombo.grid(row=0, column=1, columnspan=2, sticky="w")
 
     Label(intelFrame, text="ชื่อลูกค้า", fg="black", bg="white", justify=RIGHT).grid(row=1, column=0, sticky="e")
     clientName = Entry(intelFrame, width=70)
@@ -847,7 +920,7 @@ def saveintelClicked() :
     telNumber.grid(row=2, column=1, columnspan=2, sticky="w")
 
     Label(intelFrame, text="รูปแบบจัดส่ง", fg="black", bg="white", justify=RIGHT).grid(row=3, column=0, sticky="e")
-    deliverForm = ttk.Combobox(intelFrame, width=35, values=["ส่งเองเก่งพอ", "ขี้เกียจส่งให้หน่อย"])
+    deliverForm = ttk.Combobox(intelFrame, width=35, values=["ทางร้านจัดส่ง", "บริษัทขนส่ง"], state="readonly")
     deliverForm.grid(row=3, column=1, columnspan=2, sticky="w")
     
     Label(intelFrame, text="ชื่อบริษัทขนส่ง", fg="black", bg="white", justify=RIGHT).grid(row=4, column=0, sticky="e")
@@ -861,12 +934,15 @@ def saveintelClicked() :
     Label(intelFrame, text="ที่อยู่จัดส่ง", fg="black", bg="white", justify=RIGHT).grid(row=6, column=0, sticky="e")
     clientAddress = Text(intelFrame, width=70, height=3) # .get ได้เลย
     clientAddress.grid(row=7, column=0, columnspan=3,sticky="n")
+
     # bottom
-    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", font="verdana 20", command=saveClicked)
+    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", font="verdana 25 bold",command=saveClicked, borderless=1)
     saveBtn.grid(row=2, column=2)
 
 
 def printreportClicked() :
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global reportdaySpy, reportmonthSpy, reportyearSpy, reportdaySpy2, reportmonthSpy2, reportyearSpy2
     resetBtnColor()
     clearInfoFrame()
@@ -972,8 +1048,7 @@ def reportChange(name, frame) :
     elif name == "sum" :
         Label(subFrame, text="รายงานสรุปรายรับ-รายจ่าย", font="verdana 12", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10)
 
-    Label(subFrame, text="ตั้งแต่วันที่ %s/%s/%s - %s/%s/%s" % (
-    reportdaySpy.get(), reportmonthSpy.get(), reportyearSpy.get(), reportdaySpy2.get(), reportmonthSpy2.get(),
+    Label(subFrame, text="ตั้งแต่วันที่ %s/%s/%s - %s/%s/%s" %(reportdaySpy.get(), reportmonthSpy.get(), reportyearSpy.get(), reportdaySpy2.get(), reportmonthSpy2.get(),
     reportyearSpy2.get()),
           font="verdana 12", fg="black", bg="white").grid(row=0, column=1, sticky="w")
 
@@ -1065,15 +1140,13 @@ def reportChange(name, frame) :
 
 
 
-def saveClicked() :
-    return
-
-
 def printClicked() :
     return
 
 
 def purchaseManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
     global purchaseTree
     resetBtnColor()
     clearInfoFrame()
@@ -1787,9 +1860,6 @@ def confrimPurchaseClicked():
 
 def sellManagementClicked():
     orderProdlist = []
-    def addOrder():
-        pass
-
     def fetchsellTree():
         sellTree.delete(*sellTree.get_children())
         sql = "SELECT * FROM SellOrderTable"
@@ -1798,16 +1868,63 @@ def sellManagementClicked():
         if res:
             deType = "หน้าร้าน"
             for i in range(len(res)):
-                if res[i][5] == 1:
+                if res[i][7] == 1:
                     deType = "จัดส่ง"
-                sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], deType))
+                sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], res[i][5], res[i][6], deType))
 
 
     def addSellClicked():
+        def addOrder():
+            if sellerNameCombo.get() == "":
+                messagebox.showerror("Admin:", "กรุณาเลือกผู้ขายสินค้า")
+            elif infoTree.get_children() == ():
+                messagebox.showerror("Admin:", "ไม่มีรายการขาย")
+            else:
+                sql = '''INSERT INTO SellOrderTable (orderID, date, seller, products, quantities, prices, totalPrice, type)
+                     VALUES (?,?,?,?,?,?,?,?)'''
+                orderID = orderIDSpy.get()
+                today = date.today()
+                d = today.strftime("%d/%m/%y")
+                seller = sellerNameCombo.get()
+                productList = ""
+                quantities = ""
+                pricePerUnit = ""
+                for i in range(len(orderProdlist)):
+                    if i == len(orderProdlist) - 1:
+                        productList += orderProdlist[i][1]
+                        quantities += orderProdlist[i][3]
+                        pricePerUnit += orderProdlist[i][2]
+                    else:
+                        productList += orderProdlist[i][1] + "\n"
+                        quantities += orderProdlist[i][3] + "\n"
+                        pricePerUnit += orderProdlist[i][2] + "\n"
+                totalPrice = getTotalPrice()
+                type = 0
+                if sellTypeSpy.get() == "จัดส่ง":
+                    type = 1
+                cursor.execute(sql, [orderID, d, seller, productList, quantities, pricePerUnit, totalPrice, type])
+                conn.commit()
+                fetchsellTree()
+                messagebox.showinfo("Admin:", "เพิ่มรายการขายดังกล่าวแล้ว")
+                addSellWindow.destroy()
+
+                products = productList.split("\n")
+                quan = quantities.split("\n")
+                price = pricePerUnit.split("\n")
+                for i in range(len(products)):
+                    sql = "SELECT quantity FROM WareHouseTable WHERE productName = ?"
+                    cursor.execute(sql, [products[i]])
+                    originalQuan = cursor.fetchone()
+                    originalQuan = originalQuan[0]
+                    sql = "UPDATE WareHouseTable SET price = ?, quantity = ?, date = ? WHERE productName = ?"
+                    cursor.execute(sql, [pricePerUnit[i], originalQuan - int(quan[i]), d, products[i]])
+                    conn.commit()
+
         def fetchinfoTree():
             infoTree.delete(*infoTree.get_children())
             for i in range(len(orderProdlist)):
                 infoTree.insert("",END, values=(orderProdlist[i][0],orderProdlist[i][1],orderProdlist[i][2],orderProdlist[i][3]))
+
 
         def generateID():
             id = ""
@@ -1970,8 +2087,8 @@ def sellManagementClicked():
         Label(addSellFrame, textvariable=orderIDSpy, fg="black", bg="white", font="verdana 25").grid(row=0, column=1, sticky='w')
 
         Label(addSellFrame, text="ผู้ขาย:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
-        ordererNameCombo = ttk.Combobox(addSellFrame, values=names, state="readonly")
-        ordererNameCombo.grid(row=1, column=1, sticky='w')
+        sellerNameCombo = ttk.Combobox(addSellFrame, values=names, state="readonly")
+        sellerNameCombo.grid(row=1, column=1, sticky='w')
 
         Label(addSellFrame, text="รายการสินค้า:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
         Button(addSellFrame, text="เลือกรายการสินค้า", fg="white", bg="gray", font="verdana 15", borderless=1, command=addProductlist).grid(row=2, column=1, sticky='w', padx=5)
@@ -1989,16 +2106,23 @@ def sellManagementClicked():
         infoTree.heading("ชื่อสินค้า", text="ชื่อสินค้า")
         infoTree.heading("ราคาขายต่อหน่วย", text="ราคาขายต่อหน่วย")
         infoTree.heading("ปริมาณที่ขาย", text="ปริมาณที่ขาย")
-        infoTree.grid(row=5, columnspan=2)
+        infoTree.grid(row=3, columnspan=2)
 
         fetchinfoTree()
         totalPrice = getTotalPrice()
 
-        totalLabel = Label(addSellFrame, text="ราคารวม: " + str(totalPrice) + " บาท", fg="red", bg="white", font="verdana 20 bold")
-        totalLabel.grid(row=6, columnspan=2)
+        sellTypeSpy = StringVar()
+        sellType = ["หน้าร้าน", "จัดส่ง"]
+        sellTypeSpy.set(sellType[0])
+
+        Label(addSellFrame, text="ประเภทการจัดส่ง:", fg="black", bg="white", font="verdana 25").grid(row=4, column=0, sticky='e')
+        OptionMenu(addSellFrame, sellTypeSpy, *sellType, ).grid(row=4, column=1, sticky='w')
+
+        totalLabel = Label(addSellFrame, text="ราคารวม: " + str(totalPrice) + " บาท", fg="green", bg="white", font="verdana 20 bold")
+        totalLabel.grid(row=5, columnspan=2)
 
 
-        Button(addSellFrame, text="เพิ่มรายการสั่งซื้อ", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=addOrder).grid(row=7, columnspan=2)
+        Button(addSellFrame, text="เพิ่มรายการขาย", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=addOrder).grid(row=6, columnspan=2)
 
 
     resetBtnColor()
@@ -2030,24 +2154,278 @@ def sellManagementClicked():
 
     sellTree = ttk.Treeview(middle)
     sellTree.column("#0", width=0, stretch=NO)
-    sellTree["columns"] = ("หมายเลขการสั่งซื้อ","วันที่ขาย", "ชื่อผู้ขาย", "รายการสินค้า", 'ปริมาณที่ขาย', "ประเภทจัดส่ง")
+    sellTree["columns"] = ("หมายเลขการสั่งซื้อ","วันที่ขาย", "ชื่อผู้ขาย", "รายการสินค้า", 'ปริมาณที่ขาย', "ราคาขายต่อหน่วย", "ราคารวม", "ประเภทจัดส่ง")
 
     sellTree.column("หมายเลขการสั่งซื้อ", width=100, anchor=CENTER)
     sellTree.column("วันที่ขาย", width=100, anchor=CENTER)
     sellTree.column("ชื่อผู้ขาย", width=120, anchor=CENTER)
-    sellTree.column("รายการสินค้า", width=120, anchor=CENTER)
+    sellTree.column("รายการสินค้า", width=90, anchor=CENTER)
     sellTree.column("ปริมาณที่ขาย", width=120, anchor=CENTER)
-    sellTree.column("ประเภทจัดส่ง", width=120, anchor=CENTER)
+    sellTree.column("ราคาขายต่อหน่วย", width=120, anchor=CENTER)
+    sellTree.column("ราคารวม", width=90, anchor=CENTER)
+    sellTree.column("ประเภทจัดส่ง", width=90, anchor=CENTER)
 
     sellTree.heading("หมายเลขการสั่งซื้อ", text="หมายเลขการสั่งซื้อ")
     sellTree.heading("วันที่ขาย", text="วันที่ขาย")
     sellTree.heading("ชื่อผู้ขาย", text="ชื่อผู้ขาย")
     sellTree.heading("รายการสินค้า", text="รายการสินค้า")
     sellTree.heading("ปริมาณที่ขาย", text="ปริมาณที่ขาย")
+    sellTree.heading("ราคาขายต่อหน่วย", text="ราคาขายต่อหน่วย")
+    sellTree.heading("ราคารวม", text="ราคารวม")
     sellTree.heading("ประเภทจัดส่ง", text="ประเภทจัดส่ง")
     sellTree.grid(row=0, column=0)
 
     fetchsellTree()
+
+
+def accountManagementClicked():
+    if permission == 1:
+        return messagebox.showwarning("Admin:", "คุณไม่มีสิทธิ์เข้าถึง")
+    def addAccountClicked():
+        def AddAccout():
+            if fullnameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ชื่อ")
+                fullnameEnt.focus_force()
+            elif fullnameEnt.get().isnumeric() == True:
+                messagebox.showerror("Admin:", "ชื่อไม่สามารถเป็นตัวเลขได้")
+                fullnameEnt.focus_force()
+            elif usernameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ Username")
+                usernameEnt.focus_force()
+            elif pwdEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณากรอกรหัสผ่าน")
+                pwdEnt.focus_force()
+            else:
+                isValid = True
+                sql = "SELECT name FROM LoginTable"
+                cursor.execute(sql)
+                res = cursor.fetchall()
+                for i in range(len(res)):
+                    if res[i][0] == fullnameEnt.get():
+                        messagebox.showerror("Admin:","มีบัญชีผู้ใช้รายนี้ในฐานข้อมูลแล้ว")
+                        isValid = False
+                        break
+                
+                if isValid:
+                    sql = "INSERT INTO LoginTable (username, pwd, name, permission) VALUES (?,?,?,?)"
+                    per = 0
+                    if perSpy.get() == "บ้างส่วน":
+                        per = 1
+                    cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per])
+                    conn.commit()
+                    messagebox.showinfo("Admin:", "บัญชีผู้ใช้ใหม่ได้ถูกเพิ่มเข้าสู่ฐานระบบแล้ว")
+                    addAccoutWindow.destroy()
+                    fetchaccoutTree()
+                else:
+                    fullnameEnt.focus_force()
+
+        w = 500
+        h = 500
+        addAccoutWindow = Toplevel(root)
+        addAccoutWindow.title("เพิ่มบัญชีใหม่")
+        addAccoutWindow.rowconfigure(0, weight=1)
+        addAccoutWindow.columnconfigure(0, weight=1)
+        x = root.winfo_screenwidth() / 2 - w / 2
+        y = root.winfo_screenheight() / 2 - h / 2
+        addAccoutWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+        addAccoutFrame = Frame(addAccoutWindow, bg="white")
+        addAccoutFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
+        addAccoutFrame.columnconfigure((0,1), weight=1)  # type: ignore
+        addAccoutFrame.grid(row=0, column=0, sticky="news")
+
+        Label(addAccoutFrame, text="ชื่อ:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+        fullnameEnt = Entry(addAccoutFrame, width=20)
+        fullnameEnt.grid(row=0, column=1, sticky='w')
+
+        Label(addAccoutFrame, text="Username:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+        usernameEnt = Entry(addAccoutFrame, width=20)
+        usernameEnt.grid(row=1, column=1, sticky='w')
+
+        Label(addAccoutFrame, text="รหัสผ่าน", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+        pwdEnt = Entry(addAccoutFrame, width=20, show="●")
+        pwdEnt.grid(row=2, column=1, sticky='w')
+        
+        perSpy = StringVar()
+        perList = ["ทั้งหมด", "บ้างส่วน"]
+        perSpy.set(perList[1])
+        Label(addAccoutFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+        OptionMenu(addAccoutFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
+
+        Button(addAccoutFrame, text="เพิ่มบัญชีผู้ใช้", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddAccout).grid(row=4, columnspan=2)
+
+    def modifyAccoutClicked():
+        def ModifyAccout():
+            if fullnameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ชื่อ")
+                fullnameEnt.focus_force()
+            elif fullnameEnt.get().isnumeric() == True:
+                messagebox.showerror("Admin:", "ชื่อไม่สามารถเป็นตัวเลขได้")
+                fullnameEnt.focus_force()
+            elif usernameEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณาใส่ Username")
+                usernameEnt.focus_force()
+            elif pwdEnt.get() == "":
+                messagebox.showerror("Admin:", "กรุณากรอกรหัสผ่าน")
+                pwdEnt.focus_force()
+            else:
+                isValid = True
+                sql = "SELECT userID, name FROM LoginTable"
+                cursor.execute(sql)
+                res = cursor.fetchall()
+                for i in range(len(res)):
+                    if res[i][0] == fullnameEnt.get() and res[i][1] != selectedAcc_id:
+                        messagebox.showerror("Admin:","มีบัญชีผู้ใช้รายนี้ในฐานข้อมูลแล้ว")
+                        isValid = False
+                        break
+        
+                if isValid:
+                    per = 0
+                    if perSpy.get() == "บ้างส่วน":
+                        per = 1
+                    sql = "UPDATE LoginTable SET username = ?, pwd = ?, name = ?, permission = ? WHERE userID = ?"
+                    cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per, selectedAcc_id])
+                    conn.commit()
+                    messagebox.showinfo("Admin:", "แก้ไขบัญชีผู้ใช้เรียบร้อยแล้ว")
+                    modifyWindow.destroy()
+                    fetchaccoutTree()
+                else:
+                    fullnameEnt.focus_force()
+
+        if accountTree.focus() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกบัญชีที่ต้องการจะแก้ไข")
+        else:
+            def getPwd():
+                sql = "SELECT pwd FROM LoginTable WHERE userID = ?"
+                cursor.execute(sql, [selectedAcc_id])
+                res = cursor.fetchone()
+                return res[0]
+            
+            selectedAcc = accountTree.item(accountTree.focus(), "values")
+            selectedAcc_id = int(selectedAcc[0])
+            selectedAcc_username = selectedAcc[1]
+            selectedAcc_pwd = getPwd()
+            selectedAcc_name = selectedAcc[2]
+            selectedAcc_per = selectedAcc[3]
+
+            w = 500
+            h = 500
+            modifyWindow = Toplevel(root)
+            modifyWindow.title("แก้ไขบัญชี")
+            modifyWindow.rowconfigure(0, weight=1)
+            modifyWindow.columnconfigure(0, weight=1)
+            x = root.winfo_screenwidth() / 2 - w / 2
+            y = root.winfo_screenheight() / 2 - h / 2
+            modifyWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
+
+            modifyFrame = Frame(modifyWindow, bg="white")
+            modifyFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
+            modifyFrame.columnconfigure((0,1), weight=1)  # type: ignore
+            modifyFrame.grid(row=0, column=0, sticky="news")
+
+            Label(modifyFrame, text="ชื่อ:", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
+            fullnameEnt = Entry(modifyFrame, width=20)
+            fullnameEnt.insert(END, selectedAcc_name)
+            fullnameEnt.grid(row=0, column=1, sticky='w')
+
+            Label(modifyFrame, text="Username:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
+            usernameEnt = Entry(modifyFrame, width=20)
+            usernameEnt.insert(END, selectedAcc_username)
+            usernameEnt.grid(row=1, column=1, sticky='w')
+
+            Label(modifyFrame, text="รหัสผ่าน", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
+            pwdEnt = Entry(modifyFrame, width=20, show="●")
+            pwdEnt.insert(END, selectedAcc_pwd)
+            pwdEnt.grid(row=2, column=1, sticky='w')
+            
+            perSpy = StringVar()
+            perList = ["ทั้งหมด", "บ้างส่วน"]
+            perSpy.set(selectedAcc_per)
+            Label(modifyFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+            OptionMenu(modifyFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
+
+            Button(modifyFrame, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyAccout).grid(row=4, columnspan=2)
+
+
+    def deleteAccoutClicked():
+        if accountTree.focus() == "":
+            messagebox.showerror("Admin:", "กรุณาเลือกบัญชีที่ต้องการจะลบ")
+        else:
+            msg = messagebox.askquestion("Delete", "ต้องการจะลบผู้ใช้นี้หรือไม่", icon="warning")
+            if msg == "yes":
+                selectedAcc = accountTree.item(accountTree.focus(), "values")
+                selectedAcc_id= selectedAcc[0]
+                sql = '''DELETE FROM LoginTable
+                            WHERE userID = ?'''
+                cursor.execute(sql, [selectedAcc_id])
+                conn.commit()
+                messagebox.showinfo("Admin:", "ผู้ใช้ถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว")
+                fetchaccoutTree()
+
+
+    def fetchaccoutTree():
+        accountTree.delete(*accountTree.get_children())
+        sql = "SELECT * FROM LoginTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                per = "บ้างส่วน"
+                if res[i][4] == 0:
+                    per = "ทั้งหมด"
+                accountTree.insert("",END, values=(res[i][0],res[i][1], res[i][3], per))
+
+    clearInfoFrame()
+    resetBtnColor()
+
+    accountManagementBtn["fg"] = "blue"
+    accountManageFrame = Frame(infoFrame, bg="white")
+    accountManageFrame.rowconfigure(0, weight=1) # type: ignore
+    accountManageFrame.rowconfigure(1, weight=5)
+    accountManageFrame.columnconfigure(0, weight=1)
+    accountManageFrame.grid(row=0, column=0, sticky="news")
+
+    top = Frame(accountManageFrame, bg="white")
+    top.rowconfigure(0, weight=1)
+    top.columnconfigure(0, weight=1)
+    top.grid(row=0, column=0, sticky="news")
+
+    middle = Frame(accountManageFrame, bg="white")
+    middle.rowconfigure(0, weight=1) #type: ignore
+
+    middle.columnconfigure(0, weight=1)
+    middle.grid(row=1, column=0, sticky="news")
+
+    #header
+    Label(top, text="จัดการบัญชีผู้ใช้", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, sticky='s')
+
+    accountTree = ttk.Treeview(middle)
+    accountTree.column("#0", width=0, stretch=NO)
+    accountTree["columns"] = ("หมายเลขผู้ใช้งาน","Username", "ชื่อ", "สิทธิ์การเข้าถึง")
+
+    accountTree.column("หมายเลขผู้ใช้งาน", width=100, anchor=CENTER)
+    accountTree.column("Username", width=100, anchor=CENTER)
+    accountTree.column("ชื่อ", width=120, anchor=CENTER)
+    accountTree.column("สิทธิ์การเข้าถึง", width=120, anchor=CENTER)
+
+    accountTree.heading("หมายเลขผู้ใช้งาน", text="หมายเลขผู้ใช้งาน")
+    accountTree.heading("Username", text="Username")
+    accountTree.heading("ชื่อ", text="ชื่อ")
+    accountTree.heading("สิทธิ์การเข้าถึง", text="สิทธิ์การเข้าถึง")
+
+    accountTree.grid(row=0, column=0)
+
+    # Add Button
+    Button(middle, text="เพิ่มบัญชี", fg="black", bg="green", borderless=1, command=addAccountClicked).grid(row=0, column=0, sticky='ne', padx=180, pady=170)
+
+    # Modify Button
+    Button(middle, text="แก้ไขบัญชี", fg="black", bg="yellow", borderless=1, command=modifyAccoutClicked).grid(row=0, column=0, sticky='se', padx=280, pady=170)
+
+    #Delete Button
+    Button(middle, text="ลบบัญชี", fg="black", bg="red", borderless=1, command=deleteAccoutClicked).grid(row=0, column=0, sticky='se', padx=180, pady=170)
+    
+    fetchaccoutTree()
+
 
 w = 1024
 h = 720
@@ -2058,9 +2436,6 @@ ConnectToDatabase()
 # Login Spies
 usernameSpy = StringVar()
 pwdSpy = StringVar()
-
-
-warehouseIsopen = False
 
 LoginPage()
 root.mainloop()
