@@ -727,8 +727,8 @@ def intelinvestigateClicked():
     Label(intelinvestigateFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="black", bg="white", font="verdana 35 bold").grid(
         row=0, column=0, columnspan=3)
     # middle
-    intelSearchBar = Entry(intelinvestigateFrame, width=70)
-    intelSearchBar.grid(row=1, column=0,sticky="n")
+    intelSearchBar = Entry(intelinvestigateFrame, width=60)
+    intelSearchBar.grid(row=1, column=0,sticky="ne")
 
     searchType = ["สินค้า", "ผู้ค้าส่ง"]
 
@@ -759,7 +759,7 @@ def intelinvestigateClicked():
     yearIntelSpy = IntVar()
     yearIntelSpy.set(years[0])
 
-    OptionMenu(intelinvestigateFrame, dateSelectSpy, *dateSelect, command=lambda c:dateselectswitch(c)).grid(row=1, column=1,sticky="")
+    OptionMenu(intelinvestigateFrame, dateSelectSpy, *dateSelect, command=lambda c:dateselectswitch(c)).grid(row=1, column=1)
 
     def dateselectswitch(option):
         global day, month, year
@@ -809,14 +809,10 @@ def fetchintelinvestigatesearchtree() :
                 if intelSearchBar.get() in res[i][3] :
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
             elif searchTypeSpy.get() == "สินค้า" and dateSelectSpy.get() == "เลือกเอง" :
-                print("hi")
                 if intelSearchBar.get() in res[i][4] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
-                    print("hello")
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
             elif searchTypeSpy.get() == "ผู้ค้าส่ง" and dateSelectSpy.get() == "เลือกเอง" :
-                print("hello")
                 if intelSearchBar.get() in res[i][3] and "%d/%d/%d" % (dayIntelSpy.get(), monthIntelSpy.get(), yearIntelSpy.get()) == res[i][1] :
-                    print("hi")
                     intelInvestigateTree.insert("", END, values=(res[i][4], res[i][5], res[i][6], res[i][1], res[i][3]))
 
 
@@ -825,13 +821,13 @@ def saveintelClicked() :
     resetBtnColor()
     clearInfoFrame()
     saveIntelBtn["fg"] = "blue"
-    saveIntelFrame = Frame(infoFrame, bg="cyan")
+    saveIntelFrame = Frame(infoFrame, bg="white")
     saveIntelFrame.columnconfigure((0, 1, 2), weight=1)
     saveIntelFrame.rowconfigure((0, 2), weight=1)
     saveIntelFrame.rowconfigure(1, weight=8)
     saveIntelFrame.grid(row=0, column=0, sticky="news")
     # header
-    Label(saveIntelFrame, text="บันทึกข้อมูลการจัดส่ง", fg="black", bg="cyan", font="verdana 25").grid(row=0, column=0)
+    Label(saveIntelFrame, text="บันทึกข้อมูลการจัดส่ง", fg="black", bg="white", font="verdana 35 bold").grid(row=0, column=0, columnspan=3)
     #middle
     intelFrame = Frame(saveIntelFrame, bg="white")
     intelFrame.columnconfigure((0, 1, 2), weight=1)
@@ -866,51 +862,207 @@ def saveintelClicked() :
     clientAddress = Text(intelFrame, width=70, height=3) # .get ได้เลย
     clientAddress.grid(row=7, column=0, columnspan=3,sticky="n")
     # bottom
-    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", width=20, height=5, command=saveClicked)
+    saveBtn = Button(saveIntelFrame, text="บันทึก", fg="black", bg="lime", font="verdana 20", command=saveClicked)
     saveBtn.grid(row=2, column=2)
 
 
 def printreportClicked() :
+    global reportdaySpy, reportmonthSpy, reportyearSpy, reportdaySpy2, reportmonthSpy2, reportyearSpy2
     resetBtnColor()
     clearInfoFrame()
     printReportBtn["fg"] = "blue"
-    printReportFrame = Frame(infoFrame, bg="lime")
+    printReportFrame = Frame(infoFrame, bg="white")
     printReportFrame.rowconfigure((0, 2), weight=1)
     printReportFrame.rowconfigure(1, weight=3)
     printReportFrame.columnconfigure((0, 1), weight=1)
     printReportFrame.grid(row=0, column=0, sticky="news")
     # head
     headFrame = Frame(printReportFrame, bg="white")
-    headFrame.rowconfigure((0, 1), weight=1)
-    headFrame.columnconfigure((0, 1), weight=1)
+    headFrame.rowconfigure(0, weight=1)
+    headFrame.columnconfigure((0, 1, 2), weight=1)
     headFrame.grid(row=0, column=0, columnspan=2, sticky="news")
+
+    subheadFrame1 = Frame(headFrame, bg="white")
+    subheadFrame1.rowconfigure(0, weight=1)
+    subheadFrame1.columnconfigure((0, 1, 2), weight=1)
+    subheadFrame1.grid(row=0, column=0, sticky="s", ipadx=20)
+
+    subheadFrame2 = Frame(headFrame, bg="white")
+    subheadFrame2.rowconfigure(0, weight=1)
+    subheadFrame2.columnconfigure((0, 1, 2), weight=1)
+    subheadFrame2.grid(row=0, column=1, sticky="s", ipadx=20)
+
+    subheadFrame3 = Frame(headFrame, bg="white")
+    subheadFrame3.rowconfigure(0, weight=1)
+    subheadFrame3.columnconfigure((0, 1, 2), weight=1)
+    subheadFrame3.grid(row=0, column=2, sticky="ws", ipadx=20)
     # middle
-    middleFrame = Frame(printReportFrame, bg="orange")
+    middleFrame = Frame(printReportFrame, bg="white")
     middleFrame.rowconfigure(0, weight=1)
-    middleFrame.rowconfigure(1, weight=3)
     middleFrame.columnconfigure(0, weight=1)
     middleFrame.grid(row=1, column=0, columnspan=2, sticky="news")
     # bottom
-    printBtn = Button(printReportFrame, text="พิมพ์", fg="black", bg="yellow", command=printClicked, width=20, height=5)
+    printBtn = Button(printReportFrame, text="พิมพ์", fg="black", bg="yellow", font="verdana 20", command=printClicked)
     printBtn.grid(row=2, column=1, sticky="e", padx=10)
     # head buttons
-    purchaseReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการสั่งซื้อ", fg="black", bg="white", command=lambda:reportChange("purchase", middleFrame))
-    purchaseReportBtn.grid(row=0, column=0, sticky="news", padx=10)
-    sellingReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการขาย", fg="black", bg="white", command=lambda:reportChange("selling", middleFrame))
-    sellingReportBtn.grid(row=0, column=1, sticky="news", padx=10)
-    sumReportBtn = Button(headFrame, text="รายงานสรุปรายรับ-รายจ่าย", fg="black", bg="white", command=lambda:reportChange("sum", middleFrame))
-    sumReportBtn.grid(row=1, column=0, columnspan=2, sticky="news", pady=3, padx=40)
+    purchaseReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการสั่งซื้อ", font="verdana 16", fg="black", bg="white",
+                               command=lambda: reportChange("purchase", middleFrame))
+    purchaseReportBtn.grid(row=0, column=0, sticky="ew")
+    sellingReportBtn = Button(headFrame, text="รายงานสรุปข้อมูลการขาย", font="verdana 16", fg="black", bg="white",
+                              command=lambda: reportChange("selling", middleFrame))
+    sellingReportBtn.grid(row=0, column=1, sticky="ew")
+    sumReportBtn = Button(headFrame, text="รายงานสรุปรายรับ-รายจ่าย", font="verdana 16", fg="black", bg="white",
+                          command=lambda: reportChange("sum", middleFrame))
+    sumReportBtn.grid(row=0, column=2, columnspan=2, sticky="ew")
+
+    Label(headFrame, text="-", fg="black", bg="white", font="verdana 16").grid(row=0, column=0, columnspan=2, sticky="s")
+
+    days = [x for x in range(1, 32)]
+    months = [x for x in range(1, 13)]
+    years = [x for x in range(2023, 2033)]
+
+    today = date.today()
+
+    reportdaySpy = StringVar()
+    reportdaySpy.set(today.strftime("%d"))
+
+    reportmonthSpy = StringVar()
+    reportmonthSpy.set(today.strftime("%m"))
+
+    reportyearSpy = StringVar()
+    reportyearSpy.set(today.strftime("20%y"))
+
+    OptionMenu(subheadFrame1, reportdaySpy, *days).grid(row=0, column=0, sticky="w")  # type: ignore
+    OptionMenu(subheadFrame1, reportmonthSpy, *months).grid(row=0, column=1)  # type: ignore
+    OptionMenu(subheadFrame1, reportyearSpy, *years).grid(row=0, column=2, sticky="e")  # type: ignore
+
+    reportdaySpy2 = StringVar()
+    reportdaySpy2.set(today.strftime("%d"))
+
+    reportmonthSpy2 = StringVar()
+    reportmonthSpy2.set(today.strftime("%m"))
+
+    reportyearSpy2 = StringVar()
+    reportyearSpy2.set(today.strftime("20%y"))
+
+    OptionMenu(subheadFrame2, reportdaySpy2, *days).grid(row=0, column=0, sticky="w")  # type: ignore
+    OptionMenu(subheadFrame2, reportmonthSpy2, *months).grid(row=0, column=1)  # type: ignore
+    OptionMenu(subheadFrame2, reportyearSpy2, *years).grid(row=0, column=2, sticky="e")  # type: ignore
+
+    searchBtn = Button(subheadFrame3, text="ยืนยัน", font="verdana 16", fg="black", bg="lime", command=lambda: reportChange("", middleFrame))
+    searchBtn.grid(row=0, column=2, sticky="w")
 
 
 def reportChange(name, frame) :
     for child in frame.winfo_children() :
         child.destroy()
+
+    subFrame = Frame(frame, bg="white")
+    subFrame.rowconfigure(0, weight=1)
+    subFrame.rowconfigure(1, weight=3)
+    subFrame.columnconfigure((0, 1), weight=1)
+    subFrame.grid(row=0, column=0, sticky="news")
+
+    Label(subFrame, text="ร้านผลไม้โผทิลาษ", font="verdana 18 bold", fg="black", bg="white").grid(row=0, column=0, sticky="nw",padx=10)
+
     if name == "purchase" :
-        Label(frame, text="รายงานสรุปข้อมูลการสั่งซื้อ", fg="black", bg="white").grid(row=0, column=0, sticky="w")
+        Label(subFrame, text="รายงานสรุปข้อมูลการสั่งซื้อ", font="verdana 12", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10)
     elif name == "selling" :
-        Label(frame, text="รายงานสรุปข้อมูลการขาย", fg="black", bg="white").grid(row=0, column=0, sticky="w")
+        Label(subFrame, text="รายงานสรุปข้อมูลการขาย", font="verdana 12", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10)
     elif name == "sum" :
-        Label(frame, text="รายงานสรุปรายรับ-รายจ่าย", fg="black", bg="white").grid(row=0, column=0, sticky="w")
+        Label(subFrame, text="รายงานสรุปรายรับ-รายจ่าย", font="verdana 12", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10)
+
+    Label(subFrame, text="ตั้งแต่วันที่ %s/%s/%s - %s/%s/%s" % (
+    reportdaySpy.get(), reportmonthSpy.get(), reportyearSpy.get(), reportdaySpy2.get(), reportmonthSpy2.get(),
+    reportyearSpy2.get()),
+          font="verdana 12", fg="black", bg="white").grid(row=0, column=1, sticky="w")
+
+    today = date.today()
+    d = today.strftime("%d/%m/%y")
+    Label(subFrame, text="พิมพ์วันที่ " + d, font="verdana 12", fg="black", bg="white").grid(row=0, column=0, sticky="ws", padx=10, pady=10)
+
+    reportFrame = Frame(subFrame, bg="white")
+    reportFrame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
+    reportFrame.columnconfigure((0, 1, 2, 3, 4), weight=1)
+    reportFrame.grid(row=1, column=0, columnspan=2, sticky="news")
+
+    if name == "purchase" :
+        Label(reportFrame, text="รหัสสินค้า", font="verdana 12", fg="black", bg="white").grid(row=0, column=0)
+        Label(reportFrame, text="ชื่อสินค้า", font="verdana 12", fg="black", bg="white").grid(row=0, column=1)
+        Label(reportFrame, text="จำนวน", font="verdana 12", fg="black", bg="white").grid(row=0, column=2)
+        Label(reportFrame, text="ราคา", font="verdana 12", fg="black", bg="white").grid(row=0, column=3)
+        Label(reportFrame, text="รวม", font="verdana 12", fg="black", bg="white").grid(row=0, column=4)
+        for i in range(9) :
+            Label(reportFrame, bg="white").grid(row=i+1,column=0)
+        idprodList = []
+        prodList = []
+        quanList = []
+        costList = []
+        dummy1 = []
+        sql = "SELECT date,productList,quantities,costPerUnit,status FROM PurchaseOrderTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)):
+                if res[i][4] == 1 and eval(
+                        ("%s+%s+%s" % (reportdaySpy.get(), reportmonthSpy.get(), reportyearSpy.get())).replace("+0","+")) <= eval(res[i][0].replace("/", "+")) <= eval(("%s+%s+%s" % (reportdaySpy.get(), reportmonthSpy.get(), reportyearSpy.get())).replace("+0", "+")):
+                    if len(res[i][1].split()) > 1 :
+                        dummy1 = res[i][1].split()
+                        dummy2 = res[i][2].split()
+                        dummy3 = res[i][3].split()
+                        for x in range(len(dummy1)) :
+                            if dummy1[x] not in prodList :
+                                prodList.append(dummy1[x])
+                            print(i)
+                            if len(quanList) == len(prodList) :
+                                dummy2[x] = eval(dummy2[x] + "+" + quanList[prodList.index(dummy1[x])])
+                                quanList.append(dummy2[x])
+                            else :
+                                quanList.append(dummy2[x])
+                            if len(costList) == len(prodList):
+                                dummy3[x] = eval(dummy3[x] + "+" + costList[prodList.index(dummy1[x])])
+                                costList.append(dummy3[x])
+                            else :
+                                costList.append(dummy3[x])
+        sql = "SELECT productID, productName FROM WareHouseTable"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        if res:
+            for i in range(len(res)) :
+                if res[i][0] not in idprodList and (res[i][1] in dummy1) :
+                    idprodList.append(res[i][0])
+        sum = 0
+        con = 0
+        for i in range(len(idprodList)) :
+            Label(reportFrame, text=str(idprodList[i]), font="verdana 12", fg="black", bg="white").grid(row=i+1, column=0)
+            Label(reportFrame, text=str(prodList[i]), font="verdana 12", fg="black", bg="white").grid(row=i+1, column=1)
+            Label(reportFrame, text=str(quanList[i]), font="verdana 12", fg="black", bg="white").grid(row=i + 1,column=2)
+            Label(reportFrame, text=str(costList[i]), font="verdana 12", fg="black", bg="white").grid(row=i + 1,column=3)
+            sum = float(quanList[i]) * float(costList[i])
+            Label(reportFrame, text=str(sum), font="verdana 12", fg="black", bg="white").grid(row=i + 1,column=4)
+            con += sum
+        Label(reportFrame, text="รวม", font="verdana 12", fg="black", bg="white").grid(row=9, column=3, sticky="e")
+        Label(reportFrame, text=con, font="verdana 12", fg="black", bg="white").grid(row=9, column=4)
+    elif name == "selling" :
+        Label(reportFrame, text="รหัสสินค้า", font="verdana 12", fg="black", bg="white").grid(row=0, column=0)
+        Label(reportFrame, text="ชื่อสินค้า", font="verdana 12", fg="black", bg="white").grid(row=0, column=1)
+        Label(reportFrame, text="จำนวน", font="verdana 12", fg="black", bg="white").grid(row=0, column=2)
+        Label(reportFrame, text="ราคา", font="verdana 12", fg="black", bg="white").grid(row=0, column=3)
+        Label(reportFrame, text="รวม", font="verdana 12", fg="black", bg="white").grid(row=0, column=4)
+        for i in range(9) :
+            Label(reportFrame, bg="white").grid(row=i+1,column=0)
+    elif name == "sum" :
+        Label(reportFrame, text="สินค้าที่ซื้อ", font="verdana 12", fg="black", bg="white").grid(row=0, column=1)
+        Label(reportFrame, text="ชื่อสินค้า", font="verdana 12", fg="black", bg="white").grid(row=1, column=0)
+        Label(reportFrame, text="จำนวน", font="verdana 12", fg="black", bg="white").grid(row=1, column=1)
+        Label(reportFrame, text="ราคา", font="verdana 12", fg="black", bg="white").grid(row=1, column=2, sticky="w")
+        Label(reportFrame, text="สินค้าที่ซื้อ", font="verdana 12", fg="black", bg="white").grid(row=0, column=3)
+        Label(reportFrame, text="ชื่อสินค้า", font="verdana 12", fg="black", bg="white").grid(row=1, column=2, sticky="e")
+        Label(reportFrame, text="จำนวน", font="verdana 12", fg="black", bg="white").grid(row=1, column=3)
+        Label(reportFrame, text="ราคา", font="verdana 12", fg="black", bg="white").grid(row=1, column=4)
+        for i in range(9) :
+            Label(reportFrame, bg="white").grid(row=i+1,column=0)
+
 
 
 def saveClicked() :
@@ -1906,6 +2058,7 @@ ConnectToDatabase()
 # Login Spies
 usernameSpy = StringVar()
 pwdSpy = StringVar()
+
 
 warehouseIsopen = False
 
