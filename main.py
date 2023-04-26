@@ -75,7 +75,8 @@ def loginclicked():
                 result = cursor.fetchone()
                 if result:
                     messagebox.showinfo("Admin:", "เข้าสู่ระบบสำเร็จ")
-                    global permission
+                    global permission, name
+                    name = result[3]
                     permission = result[4]
                     MainPage()
                 else:
@@ -103,46 +104,69 @@ def MainPage():
     infoFrame.columnconfigure(0, weight=1)
     infoFrame.grid(row=0, column=1, sticky="news")
 
-    # คลังสินค้า
-    warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
-    warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
+    if permission == 0:
+        # คลังสินค้า
+        warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
+        warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
 
-    # จัดการผู้ค้าส่ง
-    supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค้าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
-    supplierManagementBtn.grid(row=1, columnspan=2, sticky="news")
+        # จัดการผู้ค้าส่ง
+        supplierManagementBtn = Button(menuFrame, text="แก้ไข/บันทึกข้อมูลผู้ค้าส่ง", bg="gray", fg="white", borderless=1, command=supplierManagementClicked)
+        supplierManagementBtn.grid(row=1, columnspan=2, sticky="news")
 
-    # จัดการข้อมูลการสั่งซื้อ
-    purchaseManagementBtn = Button(menuFrame, text="เพิ่ม/แก้ไขข้อมูลการสั่งซื้อ", bg="gray", fg="white", borderless=1, command=purchaseManagementClicked)
-    purchaseManagementBtn.grid(row=2, columnspan=2, sticky="news")
-    
-    # ขายสินค้า
-    sellManagementBtn = Button(menuFrame, text="บันทึกการขายสินค้า", bg="gray", fg="white", borderless=1, command=sellManagementClicked)
-    sellManagementBtn.grid(row=3, columnspan=2, sticky="news")
+        # จัดการข้อมูลการสั่งซื้อ
+        purchaseManagementBtn = Button(menuFrame, text="เพิ่ม/แก้ไขข้อมูลการสั่งซื้อ", bg="gray", fg="white", borderless=1, command=purchaseManagementClicked)
+        purchaseManagementBtn.grid(row=2, columnspan=2, sticky="news")
+        
+        # ขายสินค้า
+        sellManagementBtn = Button(menuFrame, text="บันทึกการขายสินค้า", bg="gray", fg="white", borderless=1, command=sellManagementClicked)
+        sellManagementBtn.grid(row=3, columnspan=2, sticky="news")
 
-    # ค้นหาสินค้า
-    productSearchBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="white", bg="gray", command=productsearchClicked, borderless=1)
-    productSearchBtn.grid(row=4, column=0, columnspan=2, sticky="news")
-    # ตรวจสอบข้อมูล
-    intelInvestigateBtn = Button(menuFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="white", bg="gray", command=intelinvestigateClicked, borderless=1)
-    intelInvestigateBtn.grid(row=5, column=0, columnspan=2, sticky="news")
-    # บันทึกข้อมูลจัดส่ง
-    saveIntelBtn = Button(menuFrame, text="บันทึกข้อมูลการจัดส่ง", fg="white", bg="gray", command=saveintelClicked, borderless=1)
-    saveIntelBtn.grid(row=6, column=0, columnspan=2, sticky="news")
+        # ค้นหาสินค้า
+        productSearchBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="white", bg="gray", command=productsearchClicked, borderless=1)
+        productSearchBtn.grid(row=4, column=0, columnspan=2, sticky="news")
+        # ตรวจสอบข้อมูล
+        intelInvestigateBtn = Button(menuFrame, text="ตรวจสอบข้อมูลการสั่งซื้อ", fg="white", bg="gray", command=intelinvestigateClicked, borderless=1)
+        intelInvestigateBtn.grid(row=5, column=0, columnspan=2, sticky="news")
+        # บันทึกข้อมูลจัดส่ง
+        saveIntelBtn = Button(menuFrame, text="บันทึกข้อมูลการจัดส่ง", fg="white", bg="gray", command=saveintelClicked, borderless=1)
+        saveIntelBtn.grid(row=6, column=0, columnspan=2, sticky="news")
 
-    # จัดพิมพ์รายงานเเสดงผลการดำเนินงาน
-    printReportBtn = Button(menuFrame, text="จัดพิมพ์รายงาน", fg="white", bg="gray", command=printreportClicked,borderless=1)
-    printReportBtn.grid(row=7, column=0, columnspan=2, sticky="news")
-    
-    # จัดการบัญชี
-    accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=accountManagementClicked,borderless=1)
-    accountManagementBtn.grid(row=8, column=0, columnspan=2, sticky="news")
+        # จัดพิมพ์รายงานเเสดงผลการดำเนินงาน
+        printReportBtn = Button(menuFrame, text="จัดพิมพ์รายงาน", fg="white", bg="gray", command=printreportClicked,borderless=1)
+        printReportBtn.grid(row=7, column=0, columnspan=2, sticky="news")
+        
+        # จัดการบัญชี
+        accountManagementBtn = Button(menuFrame, text="จัดการบัญชี", fg="white", bg="gray", command=accountManagementClicked,borderless=1)
+        accountManagementBtn.grid(row=8, column=0, columnspan=2, sticky="news")
 
-    # Logout Button
-    Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=9, column=0)
-    # Exit Button
-    Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=9, column=1)
+        # Logout Button
+        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=9, column=0)
+        # Exit Button
+        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=9, column=1)
 
-    btnlist = [warehouseBtn, supplierManagementBtn, productSearchBtn, intelInvestigateBtn, saveIntelBtn, printReportBtn, purchaseManagementBtn, sellManagementBtn, accountManagementBtn]
+        btnlist = [warehouseBtn, supplierManagementBtn, productSearchBtn, intelInvestigateBtn, saveIntelBtn, printReportBtn, purchaseManagementBtn, sellManagementBtn, accountManagementBtn]
+    else:
+        menuFrame.rowconfigure((0,1,2,3,4), weight=1) # type: ignore
+        warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
+        warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
+        
+        # ขายสินค้า
+        sellManagementBtn = Button(menuFrame, text="บันทึกการขายสินค้า", bg="gray", fg="white", borderless=1, command=sellManagementClicked)
+        sellManagementBtn.grid(row=1, columnspan=2, sticky="news")
+
+        # ค้นหาสินค้า
+        productSearchBtn = Button(menuFrame, text="ค้นหาสินค้า", fg="white", bg="gray", command=productsearchClicked, borderless=1)
+        productSearchBtn.grid(row=2, column=0, columnspan=2, sticky="news")
+
+        # บันทึกข้อมูลจัดส่ง
+        saveIntelBtn = Button(menuFrame, text="บันทึกข้อมูลการจัดส่ง", fg="white", bg="gray", command=saveintelClicked, borderless=1)
+        saveIntelBtn.grid(row=3, column=0, columnspan=2, sticky="news")
+
+        # Logout Button
+        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=4, column=0)
+        # Exit Button
+        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=4, column=1)
+        btnlist = [warehouseBtn, sellManagementBtn, productSearchBtn, saveIntelBtn]
 
 
 def clearInfoFrame():
@@ -200,16 +224,15 @@ def warehouseClicked():
 
 
     warehouseTree.grid(row=0, column=0)
+    if permission == 0:
+        # Add Button
+        Button(middle, text="เพิ่มสินค้า", fg="black", bg="green", borderless=1, command=addProductClicked).grid(row=0, column=0, sticky='ne', padx=60, pady=170)
 
-    # Add Button
-    Button(middle, text="เพิ่มสินค้า", fg="black", bg="green", borderless=1, command=addProductClicked).grid(row=0, column=0, sticky='ne', padx=60, pady=170)
+        # Modify Button
+        Button(middle, text="แก้ไขสินค้า", fg="black", bg="yellow", borderless=1, command=modifyProductClicked).grid(row=0, column=0, sticky='se', padx=160, pady=170)
 
-    # Modify Button
-    Button(middle, text="แก้ไขสินค้า", fg="black", bg="yellow", borderless=1, command=modifyProductClicked).grid(row=0, column=0, sticky='se', padx=160, pady=170)
-
-    #Delete Button
-    Button(middle, text="ลบสินค้า", fg="black", bg="red", borderless=1, command=deleteProductClicked).grid(row=0, column=0, sticky='se', padx=60, pady=170)
-    
+        #Delete Button
+        Button(middle, text="ลบสินค้า", fg="black", bg="red", borderless=1, command=deleteProductClicked).grid(row=0, column=0, sticky='se', padx=60, pady=170)
     fetchWarehouseTree()
     
 
@@ -1247,17 +1270,6 @@ def deletePurchaseClicked():
             fetchPurchaseTree()
 
 
-def getOrdererNames():
-    returnlist = []
-    sql = "SELECT name FROM LoginTable WHERE permission = 0"
-    cursor.execute(sql)
-    res = cursor.fetchall()
-    if res:
-        for i in range(len(res)):
-            returnlist.append(res[i][0])
-    return returnlist
-
-
 def getSupplier():
     returnlist = []
     sql = "SELECT supplierName FROM SupplierContactTable"
@@ -1286,10 +1298,7 @@ def getTotalCost(list):
 
 def addPurchaseClicked():
     def AddPurchaseOrder():
-        if ordererNameCombo.get() == "":
-            messagebox.showerror("Admin:", "กรุณาเลือกผู้สั่งซื้อ")
-            ordererNameCombo.focus_force()
-        elif supplierCombo.get() == "":
+        if supplierCombo.get() == "":
             messagebox.showerror("Admin:", "กรุณาเลือกผู้ค้าส่ง")
             supplierCombo.focus_force()
         elif infoTree.get_children() == ():
@@ -1298,7 +1307,7 @@ def addPurchaseClicked():
             sql = '''INSERT INTO PurchaseOrderTable (date, ordererName, supplierName, productList, quantities, costPerUnit, totalCost, status)
                      VALUES (?,?,?,?,?,?,?,?)'''
             date = "%d/%d/%d" %(daySpy.get(), monthSpy.get(), yearSpy.get())
-            ordererName = ordererNameCombo.get()
+            ordererName = name
             supplierName = supplierCombo.get()
             productList = ""
             quantities = ""
@@ -1449,7 +1458,6 @@ def addPurchaseClicked():
     addPurchaseFrame.columnconfigure((0,1), weight=1)  # type: ignore
     addPurchaseFrame.grid(row=0, column=0, sticky="news")
 
-    names = getOrdererNames()
     suppliers = getSupplier()
 
 
@@ -1479,7 +1487,7 @@ def addPurchaseClicked():
 
 
     Label(addPurchaseFrame, text="ผู้สั่งซื้อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
-    ordererNameCombo = ttk.Combobox(addPurchaseFrame, values=names, state="readonly")
+    ordererNameCombo = Label(addPurchaseFrame, text=name, fg="black", bg="white", font="verdana 25")
     ordererNameCombo.grid(row=1, column=1, sticky='w')
 
     Label(addPurchaseFrame, text="ผู้ค้าส่ง:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
@@ -1523,7 +1531,7 @@ def modifyPurchaseClicked():
                     set date = ?, ordererName = ?, supplierName = ?, productList = ?, quantities = ?, costPerUnit = ?, totalCost = ?
                     WHERE orderID = ?'''
             date = "%d/%d/%d" %(daySpy.get(), monthSpy.get(), yearSpy.get())
-            ordererName = ordererNameCombo.get()
+            ordererName = name
             supplierName = supplierCombo.get()
             productList = ""
             quantitiesStr = ""
@@ -1760,7 +1768,6 @@ def modifyPurchaseClicked():
         modifyPurchaseFrame.columnconfigure((0,1), weight=1)  # type: ignore
         modifyPurchaseFrame.grid(row=0, column=0, sticky="news")
 
-        names = getOrdererNames()
         suppliers = getSupplier()
 
 
@@ -1788,8 +1795,7 @@ def modifyPurchaseClicked():
         OptionMenu(tmpFrame, yearSpy, *years).grid(row=0, column=2) #type: ignore
 
         Label(modifyPurchaseFrame, text="ผู้สั่งซื้อ:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
-        ordererNameCombo = ttk.Combobox(modifyPurchaseFrame, values=names, state="readonly")
-        ordererNameCombo.current(names.index(oldPurchase[2]))
+        ordererNameCombo = Label(modifyPurchaseFrame, text=name, fg="black", bg="white", font="verdana 25")
         ordererNameCombo.grid(row=1, column=1, sticky='w')
 
         Label(modifyPurchaseFrame, text="ผู้ค้าส่ง:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
@@ -1866,8 +1872,8 @@ def sellManagementClicked():
         cursor.execute(sql)
         res = cursor.fetchall()
         if res:
-            deType = "หน้าร้าน"
             for i in range(len(res)):
+                deType = "หน้าร้าน"
                 if res[i][7] == 1:
                     deType = "จัดส่ง"
                 sellTree.insert("", END, values=(res[i][0], res[i][1], res[i][2], res[i][3], res[i][4], res[i][5], res[i][6], deType))
@@ -1875,9 +1881,7 @@ def sellManagementClicked():
 
     def addSellClicked():
         def addOrder():
-            if sellerNameCombo.get() == "":
-                messagebox.showerror("Admin:", "กรุณาเลือกผู้ขายสินค้า")
-            elif infoTree.get_children() == ():
+            if infoTree.get_children() == ():
                 messagebox.showerror("Admin:", "ไม่มีรายการขาย")
             else:
                 sql = '''INSERT INTO SellOrderTable (orderID, date, seller, products, quantities, prices, totalPrice, type)
@@ -1885,7 +1889,7 @@ def sellManagementClicked():
                 orderID = orderIDSpy.get()
                 today = date.today()
                 d = today.strftime("%d/%m/%y")
-                seller = sellerNameCombo.get()
+                seller = name
                 productList = ""
                 quantities = ""
                 pricePerUnit = ""
@@ -1937,16 +1941,6 @@ def sellManagementClicked():
 
             return id + str(len(res) + 1)
         
-        
-        def getOrdererNames():
-            returnlist = []
-            sql = "SELECT name FROM LoginTable"
-            cursor.execute(sql)
-            res = cursor.fetchall()
-            if res:
-                for i in range(len(res)):
-                    returnlist.append(res[i][0])
-            return returnlist
 
         def addProductlist():
             def fetchWarehouseTree():
@@ -1973,7 +1967,7 @@ def sellManagementClicked():
                 elif priceEnt.get() == "" or priceEnt.get().replace('.', '',1).isnumeric() == False:
                     messagebox.showerror("Admin:", "ราคาขายต่อหน่วยต้องเป็นจำนวนจริงเท่านั้น")
                     priceEnt.focus_force()
-                elif sellQuantityEnt.get() == "" or sellQuantityEnt.get().isnumeric() == False:
+                elif sellQuantityEnt.get() == "" or sellQuantityEnt.get().isnumeric() == False or sellQuantityEnt.get() == "0":
                     messagebox.showerror("Admin:", "ปริมาณขายต้องเป็นจำนวนเต็มบวกเท่านั้น")
                     sellQuantityEnt.focus_force()
                 else:
@@ -2077,7 +2071,6 @@ def sellManagementClicked():
         addSellFrame.columnconfigure((0,1), weight=1)  # type: ignore
         addSellFrame.grid(row=0, column=0, sticky="news")
 
-        names = getOrdererNames()
         suppliers = getSupplier()
 
         orderIDSpy = StringVar()
@@ -2087,7 +2080,7 @@ def sellManagementClicked():
         Label(addSellFrame, textvariable=orderIDSpy, fg="black", bg="white", font="verdana 25").grid(row=0, column=1, sticky='w')
 
         Label(addSellFrame, text="ผู้ขาย:", fg="black", bg="white", font="verdana 25").grid(row=1, column=0, sticky='e')
-        sellerNameCombo = ttk.Combobox(addSellFrame, values=names, state="readonly")
+        sellerNameCombo = Label(addSellFrame, text=name, fg="black", bg="white", font="verdana 25")
         sellerNameCombo.grid(row=1, column=1, sticky='w')
 
         Label(addSellFrame, text="รายการสินค้า:", fg="black", bg="white", font="verdana 25").grid(row=2, column=0, sticky='e')
@@ -2209,7 +2202,7 @@ def accountManagementClicked():
                 if isValid:
                     sql = "INSERT INTO LoginTable (username, pwd, name, permission) VALUES (?,?,?,?)"
                     per = 0
-                    if perSpy.get() == "บ้างส่วน":
+                    if perSpy.get() == "ลูกจ้าง":
                         per = 1
                     cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per])
                     conn.commit()
@@ -2247,9 +2240,9 @@ def accountManagementClicked():
         pwdEnt.grid(row=2, column=1, sticky='w')
         
         perSpy = StringVar()
-        perList = ["ทั้งหมด", "บ้างส่วน"]
+        perList = ["เจ้าของร้าน", "ลูกจ้าง"]
         perSpy.set(perList[1])
-        Label(addAccoutFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+        Label(addAccoutFrame, text="สถานะ", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
         OptionMenu(addAccoutFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
 
         Button(addAccoutFrame, text="เพิ่มบัญชีผู้ใช้", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddAccout).grid(row=4, columnspan=2)
@@ -2281,7 +2274,7 @@ def accountManagementClicked():
         
                 if isValid:
                     per = 0
-                    if perSpy.get() == "บ้างส่วน":
+                    if perSpy.get() == "ลูกจ้าง":
                         per = 1
                     sql = "UPDATE LoginTable SET username = ?, pwd = ?, name = ?, permission = ? WHERE userID = ?"
                     cursor.execute(sql, [usernameEnt.get(), pwdEnt.get(), fullnameEnt.get(), per, selectedAcc_id])
@@ -2339,9 +2332,9 @@ def accountManagementClicked():
             pwdEnt.grid(row=2, column=1, sticky='w')
             
             perSpy = StringVar()
-            perList = ["ทั้งหมด", "บ้างส่วน"]
+            perList = ["เจ้าของร้าน", "ลูกจ้าง"]
             perSpy.set(selectedAcc_per)
-            Label(modifyFrame, text="สิทธิ์การเข้าถึง", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
+            Label(modifyFrame, text="สถานะ", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
             OptionMenu(modifyFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
 
             Button(modifyFrame, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyAccout).grid(row=4, columnspan=2)
@@ -2370,9 +2363,9 @@ def accountManagementClicked():
         res = cursor.fetchall()
         if res:
             for i in range(len(res)):
-                per = "บ้างส่วน"
+                per = "ลูกจ้าง"
                 if res[i][4] == 0:
-                    per = "ทั้งหมด"
+                    per = "เจ้าของร้าน"
                 accountTree.insert("",END, values=(res[i][0],res[i][1], res[i][3], per))
 
     clearInfoFrame()
@@ -2401,17 +2394,17 @@ def accountManagementClicked():
 
     accountTree = ttk.Treeview(middle)
     accountTree.column("#0", width=0, stretch=NO)
-    accountTree["columns"] = ("หมายเลขผู้ใช้งาน","Username", "ชื่อ", "สิทธิ์การเข้าถึง")
+    accountTree["columns"] = ("หมายเลขผู้ใช้งาน","Username", "ชื่อ", "สถานะ")
 
     accountTree.column("หมายเลขผู้ใช้งาน", width=100, anchor=CENTER)
     accountTree.column("Username", width=100, anchor=CENTER)
     accountTree.column("ชื่อ", width=120, anchor=CENTER)
-    accountTree.column("สิทธิ์การเข้าถึง", width=120, anchor=CENTER)
+    accountTree.column("สถานะ", width=120, anchor=CENTER)
 
     accountTree.heading("หมายเลขผู้ใช้งาน", text="หมายเลขผู้ใช้งาน")
     accountTree.heading("Username", text="Username")
     accountTree.heading("ชื่อ", text="ชื่อ")
-    accountTree.heading("สิทธิ์การเข้าถึง", text="สิทธิ์การเข้าถึง")
+    accountTree.heading("สถานะ", text="สถานะ")
 
     accountTree.grid(row=0, column=0)
 
@@ -2439,3 +2432,6 @@ pwdSpy = StringVar()
 
 LoginPage()
 root.mainloop()
+
+cursor.close()
+conn.close()
