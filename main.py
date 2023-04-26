@@ -1960,6 +1960,14 @@ def sellManagementClicked():
                 priceEnt.delete(0, END)
                 priceEnt.insert(END, selected_prod[2])
 
+            
+            def CheckifLowerThanBuyPrice(prodID,sellprice):
+                sql = "SELECT cost FROM WareHouseTable WHERE productID = ?"
+                cursor.execute(sql, [prodID])
+                res = cursor.fetchone()
+                res= res[0]
+                return res > sellprice
+
 
             def addToProductListClicked():
                 if warehouseTree.focus() == "":
@@ -1975,6 +1983,9 @@ def sellManagementClicked():
                     if int(sellQuantityEnt.get()) > int(selected_prod[3]):
                         messagebox.showinfo("Admin:", "ปริมาณที่ขายมีมากกว่าปริมาณที่มีอยู่ในคลัง")
                         sellQuantityEnt.focus_force()
+                    elif CheckifLowerThanBuyPrice(int(selected_prod[0]), int(priceEnt.get())):
+                        messagebox.showerror("Admin:", "ราคาขายต่ำกว่าราคาซื้อ")
+                        priceEnt.focus_force()
                     else:
                         info = (selected_prod[0], selected_prod[1], priceEnt.get(), sellQuantityEnt.get())
                         info = tuple(info)
