@@ -96,7 +96,7 @@ def MainPage():
 
     menuFrame = Frame(mainpageFrame, bg="gray")
     menuFrame.columnconfigure((0,1), weight=1) # type: ignore
-    menuFrame.rowconfigure((0,1,2,3,4,5,6,7,8,9), weight=1) # type: ignore
+    menuFrame.rowconfigure((0,1,2,3,4,5,6,7,8,9,10), weight=1) # type: ignore
     menuFrame.grid(row=0, column=0, sticky="news")
 
     infoFrame = Frame(mainpageFrame, bg="white")
@@ -104,7 +104,15 @@ def MainPage():
     infoFrame.columnconfigure(0, weight=1)
     infoFrame.grid(row=0, column=1, sticky="news")
 
+    nameFrame = Frame(menuFrame, bg="gray")
+    nameFrame.rowconfigure(0, weight=1)
+    nameFrame.columnconfigure(0, weight=1)
+
+    Label(nameFrame, text="ชื่อ: " + name, bg="gray", fg="black", font="verdana 15").grid(row=0, column=0)
+
     if permission == 0:
+        nameFrame.grid(row=9, columnspan=2, sticky="news")
+        Label(nameFrame, text="สถานะ: เจ้าของร้าน", bg="gray", fg="black", font="verdana 15").grid(row=1, column=0)
         # คลังสินค้า
         warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
         warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
@@ -140,13 +148,15 @@ def MainPage():
         accountManagementBtn.grid(row=8, column=0, columnspan=2, sticky="news")
 
         # Logout Button
-        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=9, column=0)
+        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=10, column=0)
         # Exit Button
-        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=9, column=1)
+        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=10, column=1)
 
         btnlist = [warehouseBtn, supplierManagementBtn, productSearchBtn, intelInvestigateBtn, saveIntelBtn, printReportBtn, purchaseManagementBtn, sellManagementBtn, accountManagementBtn]
     else:
-        menuFrame.rowconfigure((0,1,2,3,4), weight=1) # type: ignore
+        menuFrame.rowconfigure((0,1,2,3,4,5), weight=1) # type: ignore
+        nameFrame.grid(row=4, columnspan=2, sticky="news")
+        Label(nameFrame, text="สถานะ: ลูกจ้าง", bg="gray", fg="black", font="verdana 15").grid(row=1, column=0)
         warehouseBtn = Button(menuFrame, text="คลังสินค้า", bg="gray", fg="white", borderless=1, command=warehouseClicked)
         warehouseBtn.grid(row=0, column=0, columnspan=2, sticky="news")
         
@@ -163,9 +173,9 @@ def MainPage():
         saveIntelBtn.grid(row=3, column=0, columnspan=2, sticky="news")
 
         # Logout Button
-        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=4, column=0)
+        Button(menuFrame, text="Log out", bg="white", fg="black", borderless=1, command=mainpageFrame.destroy).grid(row=5, column=0)
         # Exit Button
-        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=4, column=1)
+        Button(menuFrame, text="Exit", bg="red", fg="black", borderless=1, command=exit).grid(row=5, column=1)
         btnlist = [warehouseBtn, sellManagementBtn, productSearchBtn, saveIntelBtn]
 
 
