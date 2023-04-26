@@ -536,6 +536,9 @@ def addSupplierClicked():
         elif phoneEnt.get().replace('-', '').isnumeric() == False or (len(phoneEnt.get().replace('-', '')) != 10 and len(phoneEnt.get().replace('-', '')) != 9):
             messagebox.showerror("Admin:", "เบอร์โทรศัพท์ไม่ถูกต้อง")
             phoneEnt.focus_force()
+        elif addressEnt.get("1.0", END) == "":
+            messagebox.showerror("Admin:", "กรุณากรอกที่อยู่")
+            addressEnt.focus_force()
         else:
             isValid = True
             sql = "SELECT supplierName FROM SupplierContactTable"
@@ -548,8 +551,8 @@ def addSupplierClicked():
                     break
             
             if isValid:
-                sql = "INSERT INTO SupplierContactTable (supplierName, contactName, phone) VALUES (?,?,?)"
-                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get().replace('-','')])
+                sql = "INSERT INTO SupplierContactTable (supplierName, contactName, phone, address) VALUES (?,?,?,?)"
+                cursor.execute(sql, [supplierNameEnt.get(), contactNameEnt.get(), phoneEnt.get().replace('-',''), addressEnt.get("1.0", END)])
                 conn.commit()
                 messagebox.showinfo("Admin:", "ผู้ค้าส่งใหม่ได้ถูกเพิ่มเข้าสู่ฐานระบบแล้ว")
                 addSupplierWindow.destroy()
@@ -569,7 +572,7 @@ def addSupplierClicked():
     addSupplierWindow.geometry("%dx%d+%d+%d" %(w, h, x, y))
 
     addSupplierFrame = Frame(addSupplierWindow, bg="white")
-    addSupplierFrame.rowconfigure((0,1,2,3), weight=1) #type: ignore
+    addSupplierFrame.rowconfigure((0,1,2,3,4), weight=1) #type: ignore
     addSupplierFrame.columnconfigure((0,1), weight=1)  # type: ignore
     addSupplierFrame.grid(row=0, column=0, sticky="news")
 
@@ -585,7 +588,11 @@ def addSupplierClicked():
     phoneEnt = Entry(addSupplierFrame, width=20)
     phoneEnt.grid(row=2, column=1, sticky='w')
 
-    Button(addSupplierFrame, text="เพิ่มผู้ค้าส่ง", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddSupplier).grid(row=3, columnspan=2)
+    Label(addSupplierFrame, text="ที่อยู่ติดต่อ", fg="black", bg="white", font="verdana 25").grid(row=3,column=0,sticky='ne')
+    addressEnt = Text(addSupplierFrame, width=60, height=5)
+    addressEnt.grid(row=3, column=0, columnspan=2, sticky='s')
+
+    Button(addSupplierFrame, text="เพิ่มผู้ค้าส่ง", fg="black", bg="green", borderless=1, font="verdana 25 bold", command=AddSupplier).grid(row=4, columnspan=2)
 
 
 def modifySupperlierClicked():
@@ -898,11 +905,11 @@ def saveintelClicked() :
             prodID.delete(0, END)
         else:
             if deliverForm.get() == "บริษัทิขนส่ง": 
-                sql = "INSERT INTO DeliveryTable (name, phone, type, deliveryName, trackingID, adress) VALUES (?,?,?,?,?,?)"
-                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 1, transportName.get(), prodID.get(), clientAddress.get("1.0", END)])
+                sql = "INSERT INTO DeliveryTable (name, date, phone, type, deliveryName, trackingID, adress) VALUES (?,?,?,?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), "%d/%d/%d" % (daySpy.get(), monthSpy.get(), yearSpy.get()), telNumber.get().replace('-', ''), 1, transportName.get(), prodID.get(), clientAddress.get("1.0", END)])
             else:
-                sql = "INSERT INTO DeliveryTable (name, phone, type, adress) VALUES (?,?,?,?)"
-                cursor.execute(sql, [clientName.get(), telNumber.get().replace('-', ''), 0, clientAddress.get("1.0", END)])
+                sql = "INSERT INTO DeliveryTable (name, date, phone, type, adress) VALUES (?,?,?,?,?)"
+                cursor.execute(sql, [clientName.get(), "%d/%d/%d" % (daySpy.get(), monthSpy.get(), yearSpy.get()), telNumber.get().replace('-', ''), 0, clientAddress.get("1.0", END)])
             conn.commit()
             sql = '''SELECT seq FROM sqlite_sequence WHERE name = "DeliveryTable"'''
             cursor.execute(sql)
@@ -931,8 +938,26 @@ def saveintelClicked() :
     intelFrame.grid(row=1, column=0, columnspan=3, sticky="news")
 
     Label(intelFrame, text="หมายเลขคำสั่งซื้อ", fg="black", bg="white", justify=RIGHT).grid(row=0, column=0, sticky="e")
-    idCombo = ttk.Combobox(intelFrame, width=70, values=getOrderID(), state="readonly")
-    idCombo.grid(row=0, column=1, columnspan=2, sticky="w")
+    idCombo = ttk.Combobox(intelFrame, width=20, values=getOrderID(), state="readonly")
+    idCombo.grid(row=0, column=1, sticky="w")
+
+    days = [x for x in range(1, 32)]
+    months = [x for x in range(1, 13)]
+    years = [x for x in range(2023, 2033)]
+
+    daySpy = IntVar()
+    daySpy.set(days[0])
+
+    monthSpy = IntVar()
+    monthSpy.set(months[0])
+
+    yearSpy = IntVar()
+    yearSpy.set(years[0])
+
+    Label(intelFrame, text="วันที่ส่ง", fg="black", bg="white", justify=RIGHT).grid(row=0, column=2, sticky="w")
+    OptionMenu(intelFrame, daySpy, *days).grid(row=0, column=2, sticky="w", padx=40)  # type: ignore
+    OptionMenu(intelFrame, monthSpy, *months).grid(row=0, column=2)  # type: ignore
+    OptionMenu(intelFrame, yearSpy, *years).grid(row=0, column=2, sticky="e", padx=30)  # type: ignore
 
     Label(intelFrame, text="ชื่อลูกค้า", fg="black", bg="white", justify=RIGHT).grid(row=1, column=0, sticky="e")
     clientName = Entry(intelFrame, width=70)
