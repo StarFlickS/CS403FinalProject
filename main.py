@@ -1775,6 +1775,12 @@ def modifyPurchaseClicked():
         for i in range(len(quantities)):
             total += float(quantities[i]) * float(costs[i])
         return total
+    
+    def getName(id):
+        sql = "SELECT ordererName FROM PurchaseOrderTable WHERE orderID = ?"
+        cursor.execute(sql, [id])
+        res = cursor.fetchone()
+        return res[0]
 
     if purchaseTree.focus() == "":
         messagebox.showerror("Admin:", "กรุณาเลือกคำสั่งซื้อที่ต้องการจะแก้ไข")
@@ -1782,6 +1788,7 @@ def modifyPurchaseClicked():
         messagebox.showerror("Admin:", "รายการสั่งซื้อดำเนินการเสร็จสมบูรณ์แล้ว ไม่สามารถแก้ไขได้")
     else:
         oldPurchase = purchaseTree.item(purchaseTree.focus(), "values")
+        id = oldPurchase[0]
         date = oldPurchase[1].split("/")
         productsName = oldPurchase[4].split("\n")
         quantities = oldPurchase[5].split("\n")
@@ -1804,7 +1811,7 @@ def modifyPurchaseClicked():
         modifyPurchaseFrame.grid(row=0, column=0, sticky="news")
 
         suppliers = getSupplier()
-
+        name = getName(id)
 
         Label(modifyPurchaseFrame, text="วันที่สั่งซื้อ", fg="black", bg="white", font="verdana 25").grid(row=0, column=0, sticky='e')
         tmpFrame = Frame(modifyPurchaseFrame, bg="white")
