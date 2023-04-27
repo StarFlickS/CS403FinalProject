@@ -1,3 +1,6 @@
+'''
+โปรแกรมจัดการคลังสินค้า
+'''
 import sqlite3
 from tkinter import *
 from tkinter import messagebox
@@ -2390,7 +2393,7 @@ def accountManagementClicked():
             Label(modifyFrame, text="สถานะ", fg="black", bg="white", font="verdana 25").grid(row=3, column=0, sticky='e')
             OptionMenu(modifyFrame, perSpy, *perList).grid(row=3, column=1, sticky='w')
 
-            Button(modifyFrame, text="แก้ไขผู้ค้าส่ง", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyAccout).grid(row=4, columnspan=2)
+            Button(modifyFrame, text="แก้ไขบัญชีผู้ใช้", fg="black", bg="yellow", borderless=1, font="verdana 25 bold", command=ModifyAccout).grid(row=4, columnspan=2)
 
 
     def deleteAccoutClicked():
